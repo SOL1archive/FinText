@@ -18,3 +18,5 @@
 |pandas|1.5.2|
 |torch|1.13.0|
 |transformers|4.24.0|
+|scipy|1.9.3|
+|scikit-learn|1.1.3|
