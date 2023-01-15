@@ -28,6 +28,11 @@ class FinTextModel(nn.Module):
         else:
             self.hyper_parameters = hyper_parameters
 
+        self.ko_tokenizer = ElectraTokenizer.from_pretrained('monologg/koelectra-base-v3-discriminator')
+        self.ko_model = ElectraModel.from_pretrained('monologg/koelectra-base-v3-discriminator')
+        self.kc_tokenizer = ElectraTokenizer.from_pretrained('beomi/KcELECTRA-base-v2022')
+        self.kc_model = ElectraModel.from_pretrained('beomi/KcELECTRA-base-v2022')
+
         self.community_cnn = CNN_Layer(
             in_channels=1,
             out_channels=self.hyper_parameters['community']['cnn_out_channels'],
@@ -49,3 +54,6 @@ class FinTextModel(nn.Module):
                 self.hyper_parameters['article']['kernel_size'][1] // 2,
                 ) if self.hyper_parameters['article']['same'] else 0
         )
+
+    def forward():
+        pass
