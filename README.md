@@ -12,7 +12,9 @@
 |Python|CPython|3.10.x|
 
 ## Requirments
-
-|||
+|Libraries or Frameworks|Version|
 |-|-|
-|||
+|numpy|1.23.5|
+|pandas|1.5.2|
+|torch|1.13.0|
+|transformers|4.24.0|
