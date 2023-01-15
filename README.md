@@ -24,3 +24,5 @@
 |transformers|4.24.0|
 |scipy|1.9.3|
 |scikit-learn|1.1.3|
+|seaborn|0.12.1|
+|matplotlib|3.6.2|
