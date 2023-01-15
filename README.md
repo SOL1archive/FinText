@@ -11,6 +11,10 @@
 |OS Platform|Ubuntu-Linux|20.04 LTS or Later|
 |Python|CPython|3.10.x|
 
+
+## Model Diagram
+![](./docs/NLP%20Architecture.png)
+
 ## Requirments
 |Libraries or Frameworks|Version|
 |-|-|
