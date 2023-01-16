@@ -17,49 +17,34 @@ class FinTextModel(nn.Module):
 
         if hyper_parameters == None:
             self.hyper_parameters = {
-                'community': {
-                    'cnn_out_channels': 10,
-                    'kernel_size': (9, 3),
-                    'stride': 1,
-                    'same': True
-                },
-                'article': {
-                    'cnn_out_channels': 10,
-                    'kernel_size': (9, 3),
-                    'stride': 1,
-                    'same': True
-                },
-                'max_row_len': 10000,
+                'article_row_len': 100000, # 조정될 필요 있음
+                'community_row_len': 100000,
                 'decomposition_method': 'SVD'
             }
         else:
             self.hyper_parameters = hyper_parameters
 
+        # Pre-trained Model
         self.ko_tokenizer = ElectraTokenizer.from_pretrained('monologg/koelectra-base-v3-discriminator')
         self.ko_model = ElectraModel.from_pretrained('monologg/koelectra-base-v3-discriminator')
         self.kc_tokenizer = ElectraTokenizer.from_pretrained('beomi/KcELECTRA-base-v2022')
         self.kc_model = ElectraModel.from_pretrained('beomi/KcELECTRA-base-v2022')
 
+        # Neural Networks
         self.community_cnn = CNN_Layer(
             in_channels=1,
-            out_channels=self.hyper_parameters['community']['cnn_out_channels'],
-            kernel_size=self.hyper_parameters['community']['kernel_size'],
-            stride=self.hyper_parameters['community']['stride'],
-            padding=(
-                self.hyper_parameters['community']['kernel_size'][0] // 2,
-                self.hyper_parameters['community']['kernel_size'][1] // 2,
-                ) if self.hyper_parameters['community']['same'] else 0
+            out_channels=10,
+            kernel_size=(9, 3),
+            stride=1,
+            padding=(4, 1)
         )
 
         self.article_cnn = CNN_Layer(
             in_channels=1,
-            out_channels=self.hyper_parameters['article']['cnn_out_channels'],
-            kernel_size=self.hyper_parameters['article']['kernel_size'],
-            stride=self.hyper_parameters['article']['stride'],
-            padding=(
-                self.hyper_parameters['article']['kernel_size'][0] // 2,
-                self.hyper_parameters['article']['kernel_size'][1] // 2,
-                ) if self.hyper_parameters['article']['same'] else 0
+            out_channels=10,
+            kernel_size=(9, 3),
+            stride=1,
+            padding=(4, 1)
         )
 
         self.community_metric_ffn = nn.Sequential(
@@ -86,29 +71,30 @@ class FinTextModel(nn.Module):
         
         return torch.cat(article_tensor_lt, dim=0)
 
-    def dim_reduction(self, tensor):
-        max_row = self.hyper_parameters['max_row_len']
-        if tensor.shape[0] <= max_row:
+    def dim_reduction(self, tensor, row_len):
+        if tensor.shape[0] == row_len:
             return tensor
+        elif tensor.shape[0] < row_len:
+            pass
         else:
             method = self.hyper_parameters['decomposition_method']
             if method == 'SVD':
                 U, S, V = torch.svd(tensor)
 
-                reduced_S = S[:max_row]
-                reduced_U = U[:, :max_row]
-                reduced_V = V[:max_row, :]
+                reduced_S = S[:row_len]
+                reduced_U = U[:, :row_len]
+                reduced_V = V[:row_len, :]
                 reduced_tensor = torch.mm(reduced_U, torch.mm(torch.diag(reduced_S), reduced_V.t()))
             elif method == 'PCA':
                 vectors_np = tensor.numpy()
 
-                pca = PCA(n_components=10)
+                pca = PCA(n_components=row_len)
                 reduced_tensor = pca.fit_transform(vectors_np)
                 reduced_tensor = torch.from_numpy(reduced_tensor)
             elif method == 'NMF':
                 vectors_np = tensor.numpy()
 
-                nmf = NMF(n_components=max_row)
+                nmf = NMF(n_components=row_len)
                 reduced_tensor = nmf.fit_transform(vectors_np)
                 reduced_tensor = torch.from_numpy(reduced_tensor)
             else:
@@ -141,4 +127,7 @@ class FinTextModel(nn.Module):
         community_metric_index = torch.tensor(x_dict['community_metric_index']).view(-1, 1)
 
         # In Neural Network
+        article_tensor = self.article_cnn(article_tensor)
+
+        community_tensor = self.community_cnn(community_tensor)
         community_metric_index = self.community_metric_ffn(community_metric_index)
