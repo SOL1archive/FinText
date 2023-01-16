@@ -12,17 +12,17 @@ from transformers import ElectraTokenizer, ElectraModel
 from utils import CNN_Layer
 
 class FinTextModel(nn.Module):
-    def __init__(self, hyper_parameters=None):
+    def __init__(self, config=None):
         super(FinTextModel, self).__init__()
 
-        if hyper_parameters == None:
-            self.hyper_parameters = {
+        if config == None:
+            self.config = {
                 'article_row_len': 100000, # 조정될 필요 있음
                 'community_row_len': 100000,
                 'decomposition_method': 'SVD'
             }
         else:
-            self.hyper_parameters = hyper_parameters
+            self.config = config
 
         # Pre-trained Model
         self.ko_tokenizer = ElectraTokenizer.from_pretrained('monologg/koelectra-base-v3-discriminator')
@@ -58,9 +58,21 @@ class FinTextModel(nn.Module):
             nn.ReLU()
         )
 
-        self.softmax = nn.Softmax(dim=10)
+        self.total_ffn = nn.Sequential(
+            nn.Linear(in_features=10000, out_features=10000),
+            nn.ReLU(),
+            nn.Linear(in_features=10000, out_features=7000),
+            nn.ReLU(),
+            nn.Linear(in_features=7000, out_features=5000),
+            nn.ReLU(),
+        )
 
-    def embed_text(text_lt, tokenizer, model):
+        self.softmax = nn.Sequential(
+            nn.Linear(in_features=5000, out_features=4),
+            nn.Softmax(dim=10)
+        )
+
+    def embed_text(self, text_lt, tokenizer, model):
         article_tensor_lt = []
         for text in text_lt:
             base_vector = torch.tensor(tokenizer.encode(text)).unsqueeze(0)
@@ -71,13 +83,13 @@ class FinTextModel(nn.Module):
         
         return torch.cat(article_tensor_lt, dim=0)
 
-    def dim_reduction(self, tensor, row_len):
+    def dim_fix(self, tensor, row_len):
         if tensor.shape[0] == row_len:
             return tensor
         elif tensor.shape[0] < row_len:
             pass
         else:
-            method = self.hyper_parameters['decomposition_method']
+            method = self.config['decomposition_method']
             if method == 'SVD':
                 U, S, V = torch.svd(tensor)
 
@@ -120,9 +132,9 @@ class FinTextModel(nn.Module):
             x_dict['price_vector'].append(price_vector)
 
         article_tensor = torch.cat(x_dict['article_matrix'], dim=0)
-        article_tensor = self.dim_reduction(article_tensor)
+        article_tensor = self.dim_fix(article_tensor, self.config['article_row_len'])
         community_tensor = torch.cat(x_dict['community_matrix'], dim=0)
-        community_tensor = self.dim_reduction(community_tensor)
+        community_tensor = self.dim_fix(community_tensor, self.config['community_row_len'])
     
         community_metric_index = torch.tensor(x_dict['community_metric_index']).view(-1, 1)
 
@@ -131,3 +143,5 @@ class FinTextModel(nn.Module):
 
         community_tensor = self.community_cnn(community_tensor)
         community_metric_index = self.community_metric_ffn(community_metric_index)
+
+        
