@@ -1,4 +1,7 @@
+import numpy as np
 import pandas as pd
+
+from sklearn.decomposition import TruncatedSVD, PCA, NMF
 
 import torch
 import torch.nn as nn
@@ -10,7 +13,7 @@ from utils import CNN_Layer
 
 class FinTextModel(nn.Module):
     def __init__(self, hyper_parameters=None):
-        super().__init__()
+        super(FinTextModel, self).__init__()
 
         if hyper_parameters == None:
             self.hyper_parameters = {
@@ -25,7 +28,9 @@ class FinTextModel(nn.Module):
                     'kernel_size': (9, 3),
                     'stride': 1,
                     'same': True
-                }
+                },
+                'max_row_len': 10000,
+                'decomposition_method': 'SVD'
             }
         else:
             self.hyper_parameters = hyper_parameters
@@ -64,9 +69,8 @@ class FinTextModel(nn.Module):
         )
 
         self.community_ffn = nn.Sequential(
-            nn.Linear(
-                
-                )
+            nn.Linear(in_features=1, out_features=1),
+            nn.ReLU()
         )
 
         self.softmax = nn.Softmax(dim=10)
@@ -75,12 +79,42 @@ class FinTextModel(nn.Module):
         article_tensor_lt = []
         for text in text_lt:
             base_vector = torch.tensor(tokenizer.encode(text)).unsqueeze(0)
-            embedded_vector = torch.tensor(model(base_vector)[0][0][0])
+            embedded_matrix = torch.tensor(model(base_vector)[0][0])
             article_tensor_lt.append(
-                embedded_vector
+                embedded_matrix
             )
         
-        return torch.stack(article_tensor_lt)
+        return torch.cat(article_tensor_lt, dim=0)
+
+    def dim_reduction(self, tensor):
+        max_row = self.hyper_parameters['max_row_len']
+        if tensor.shape[0] <= max_row:
+            return tensor
+        else:
+            method = self.hyper_parameters['decomposition_method']
+            if method == 'SVD':
+                U, S, V = torch.svd(tensor)
+
+                reduced_S = S[:max_row]
+                reduced_U = U[:, :max_row]
+                reduced_V = V[:max_row, :]
+                reduced_tensor = torch.mm(reduced_U, torch.mm(torch.diag(reduced_S), reduced_V.t()))
+            elif method == 'PCA':
+                vectors_np = tensor.numpy()
+
+                pca = PCA(n_components=10)
+                reduced_tensor = pca.fit_transform(vectors_np)
+                reduced_tensor = torch.from_numpy(reduced_tensor)
+            elif method == 'NMF':
+                vectors_np = tensor.numpy()
+
+                nmf = NMF(n_components=max_row)
+                reduced_tensor = nmf.fit_transform(vectors_np)
+                reduced_tensor = torch.from_numpy(reduced_tensor)
+            else:
+                raise RuntimeError
+
+            return reduced_tensor
 
     def forward(self, x):
         x_dict = dict()
@@ -99,8 +133,12 @@ class FinTextModel(nn.Module):
             x_dict['community_metric_index'].append(community_metric_index)
             x_dict['price_vector'].append(price_vector)
 
-        df = pd.DataFrame(x_dict)
+        article_tensor = torch.cat(x_dict['article_matrix'], dim=0)
+        article_tensor = self.dim_reduction(article_tensor)
+        community_tensor = torch.cat(x_dict['community_matrix'], dim=0)
+        community_tensor = self.dim_reduction(community_tensor)
+    
+        community_metric_index = torch.tensor(x_dict['community_metric_index']).view(-1, 1)
 
-        article_tensor = torch.stack(df['article_matrix'])
-        community_tensor = torch.stack(df['community_matrix'])
-        
+        # In Neural Network
+        community_metric_index = self.community_metric_ffn(community_metric_index)
