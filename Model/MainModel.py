@@ -1,3 +1,5 @@
+import pandas as pd
+
 import torch
 import torch.nn as nn
 import torch.functional as F
@@ -55,5 +57,50 @@ class FinTextModel(nn.Module):
                 ) if self.hyper_parameters['article']['same'] else 0
         )
 
-    def forward():
-        pass
+        self.community_metric_ffn = nn.Sequential(
+            nn.Linear(in_features=1, out_features=1, bias=False),
+            nn.BatchNorm1d(num_features=1),
+            nn.ReLU()
+        )
+
+        self.community_ffn = nn.Sequential(
+            nn.Linear(
+                
+                )
+        )
+
+        self.softmax = nn.Softmax(dim=10)
+
+    def embed_text(text_lt, tokenizer, model):
+        article_tensor_lt = []
+        for text in text_lt:
+            base_vector = torch.tensor(tokenizer.encode(text)).unsqueeze(0)
+            embedded_vector = torch.tensor(model(base_vector)[0][0][0])
+            article_tensor_lt.append(
+                embedded_vector
+            )
+        
+        return torch.stack(article_tensor_lt)
+
+    def forward(self, x):
+        x_dict = dict()
+        x_dict['article_matrix'] = []
+        x_dict['community_matrix'] = []
+        x_dict['community_metric_index'] = []
+        x_dict['price_vector'] = []
+        for period in x:
+            article_matrix = self.embed_text(period['ArticleText'], self.ko_tokenizer, self.ko_model)
+            community_matrix = self.embed_text(period['CommunityText'], self.kc_tokenizer, self.ko_model)
+            community_metric_index = period['MetricIndex']
+            price_vector = torch.tensor([period['Open'], period['High'], period['Low'], period['Close']])
+            
+            x_dict['article_matrix'].append(article_matrix)
+            x_dict['community_matrix'].append(community_matrix)
+            x_dict['community_metric_index'].append(community_metric_index)
+            x_dict['price_vector'].append(price_vector)
+
+        df = pd.DataFrame(x_dict)
+
+        article_tensor = torch.stack(df['article_matrix'])
+        community_tensor = torch.stack(df['community_matrix'])
+        

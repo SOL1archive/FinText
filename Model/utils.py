@@ -13,6 +13,7 @@ def CNN_Layer(in_channels, out_channels, kernel_size, stride, padding):
             stride=stride, 
             padding=padding
             ),
-        nn.GELU(),
+        nn.BatchNorm2d(num_features=out_channels),
+        nn.ReLU(),
         nn.MaxPool2d(kernel_size=kernel_size)
     )
