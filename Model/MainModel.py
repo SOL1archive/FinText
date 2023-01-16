@@ -5,7 +5,7 @@ from sklearn.decomposition import TruncatedSVD, PCA, NMF
 
 import torch
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 
 from transformers import ElectraTokenizer, ElectraModel
 
@@ -87,7 +87,7 @@ class FinTextModel(nn.Module):
         if tensor.shape[0] == row_len:
             return tensor
         elif tensor.shape[0] < row_len:
-            pass
+            return F.pad(tensor, (row_len, tensor.shape[1]), value=0)
         else:
             method = self.config['decomposition_method']
             if method == 'SVD':
