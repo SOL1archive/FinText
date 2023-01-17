@@ -76,7 +76,7 @@ class FinTextDataset(Dataset):
         kc_tokenizer = ElectraTokenizer.from_pretrained("beomi/KcELECTRA-base-v2022")
         kc_model = ElectraModel.from_pretrained("beomi/KcELECTRA-base-v2022")
 
-        data_lt = []
+        feature_lt = []
         for period in self.feature_df.iterrows():
             article_matrix = embed_text(
                 period["ArticleText"], ko_tokenizer, ko_model
@@ -98,16 +98,21 @@ class FinTextDataset(Dataset):
                 dim=1
             )
 
-            data_lt.append(row_tensor)
+            feature_lt.append(row_tensor)
         
-        row_lt = []
-        for row in divide_chunks(data_lt, self.config['bundle_size']):
-            row_lt.append(
-                torch.stack(row)
-                )
+        def make_chunk_and_stack(data_lt):
+            row_lt = []
+            for row in divide_chunks(feature_lt, self.config['bundle_size']):
+                row_lt.append(
+                    torch.stack(row)
+                    )
 
-        self.feature_tensor = torch.stack(data_lt)
-        self.target_tensor = torch.tensor(pd.get_dummies(self.df['Label']).values)
+            return torch.stack(row_lt)
+
+        self.feature_tensor = make_chunk_and_stack(feature_lt)
+        self.target_tensor = make_chunk_and_stack(
+            pd.get_dummies(self.df['Label']).values
+        )
 
     def __len__(self):
         return len(self.feature_tensor)
