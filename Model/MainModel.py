@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from Model.utils import CNN_Layer
+from Model.SubModel import *
 
 class FinTextModel(nn.Module):
     def __init__(self):
@@ -27,10 +27,8 @@ class FinTextModel(nn.Module):
             nn.Linear(in_features=1, out_features=1), nn.ReLU()
         )
 
-        self.gru = nn.Sequential(
-            nn.GRU(input_size=4, hidden_size=10, num_layers=5, batch_first=True)
-        )
-
+        self.gru = GRU(input_size=4, hidden_size=10, output_size=4, num_layers=5)
+            
         self.total_ffn = nn.Sequential(
             nn.Linear(in_features=10000, out_features=10000),
             nn.ReLU(),
@@ -49,7 +47,7 @@ class FinTextModel(nn.Module):
         article_tensor = x[:, 0, :, :, :]
         community_tensor = x[:, 1, :, :, :]
         community_metric_index = x[:, 2]
-        price_index = x[:, 3, :]
+        price_index = x[:, 3, :].unsqeeze(0)
 
         # In Neural Network
         article_tensor = self.article_cnn(article_tensor)
