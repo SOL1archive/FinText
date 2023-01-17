@@ -28,4 +28,3 @@ for epoch in range(dataloader):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
