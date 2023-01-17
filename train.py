@@ -4,7 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.optim import Adam
 
 from Data.Dataset import FinTextDataset
-from Data.Dataloader import FinTextDataLoader
+from Data.DataLoader import FinTextDataLoader
 from Model.MainModel import FinTextModel
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
