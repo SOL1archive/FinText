@@ -28,7 +28,7 @@ class FinTextModel(nn.Module):
         )
 
         self.gru = nn.Sequential(
-            nn.GRU(input_size=4, hidden_size=10, num_layers=2)
+            nn.GRU(input_size=4, hidden_size=10, num_layers=5)
         )
 
         self.hidden_init_state = torch.zeros()
@@ -48,10 +48,10 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        article_tensor = x[0]
-        community_tensor = x[1]
-        community_metric_index = x[2]
-        price_index = x[3]
+        article_tensor = x[:, 0, :, :, :]
+        community_tensor = x[:, 1, :, :, :]
+        community_metric_index = x[:, 2]
+        price_index = x[:, 3, :]
 
         # In Neural Network
         article_tensor = self.article_cnn(article_tensor)
@@ -59,7 +59,7 @@ class FinTextModel(nn.Module):
         community_tensor = self.community_cnn(community_tensor)
         community_metric_index = self.community_metric_ffn(community_metric_index)
         
-        price_index = self.gru(price_index)
+        price_index, _ = self.gru(price_index)
 
         total_out = torch.cat(
             [
