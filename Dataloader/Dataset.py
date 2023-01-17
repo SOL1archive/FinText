@@ -10,6 +10,8 @@ from torch.utils.data import Dataset
 
 from transformers import ElectraTokenizer, ElectraModel
 
+from utils import *
+
 class FinTextDataset(Dataset):
     def __init__(self, df, config=None):
         super(FinTextDataset, self).__init__()
@@ -20,11 +22,12 @@ class FinTextDataset(Dataset):
                 "article_row_len": 5000,  # 조정될 필요 있음
                 "community_row_len": 1000,
                 "decomposition_method": "SVD",
+                'bundle_size': 15
             }
         else:
             self.config = config
 
-        def dim_fix(self, tensor, row_len):
+        def dim_fix(tensor, row_len):
             if tensor.shape[0] == row_len:
                 return tensor
             elif tensor.shape[0] < row_len:
@@ -56,9 +59,8 @@ class FinTextDataset(Dataset):
                     raise RuntimeError
 
                 return reduced_tensor
-
             
-        def embed_text(self, text_lt, tokenizer, model):
+        def embed_text(text_lt, tokenizer, model):
             article_tensor_lt = []
             for text in text_lt:
                 base_vector = torch.tensor(tokenizer.encode(text)).unsqueeze(0)
@@ -67,47 +69,48 @@ class FinTextDataset(Dataset):
 
             return torch.cat(article_tensor_lt, dim=0)
         
-        self.ko_tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-        self.ko_model = ElectraModel.from_pretrained("monologg/koelectra-base-v3-discriminator")
-        self.kc_tokenizer = ElectraTokenizer.from_pretrained("beomi/KcELECTRA-base-v2022")
-        self.kc_model = ElectraModel.from_pretrained("beomi/KcELECTRA-base-v2022")
+        self.feature_df = self.df.drop('Label', axis=1)
 
-        x_dict = dict()
-        x_dict["article_matrix"] = []
-        x_dict["community_matrix"] = []
-        x_dict["community_metric_index"] = []
-        x_dict["price_vector"] = []
-        for period in self.df.iterrows():
+        ko_tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+        ko_model = ElectraModel.from_pretrained("monologg/koelectra-base-v3-discriminator")
+        kc_tokenizer = ElectraTokenizer.from_pretrained("beomi/KcELECTRA-base-v2022")
+        kc_model = ElectraModel.from_pretrained("beomi/KcELECTRA-base-v2022")
+
+        data_lt = []
+        for period in self.feature_df.iterrows():
             article_matrix = embed_text(
-                period["ArticleText"], self.ko_tokenizer, self.ko_model
+                period["ArticleText"], ko_tokenizer, ko_model
             )
+            article_matrix = dim_fix(article_matrix)
+
             community_matrix = embed_text(
-                period["CommunityText"], self.kc_tokenizer, self.ko_model
+                period["CommunityText"], kc_tokenizer, kc_model
             )
+            community_matrix = dim_fix(community_matrix)
             community_metric_index = period["MetricIndex"]
+
             price_vector = torch.tensor(
                 [period["Open"], period["High"], period["Low"], period["Close"]]
             )
 
-            x_dict["article_matrix"].append(article_matrix)
-            x_dict["community_matrix"].append(community_matrix)
-            x_dict["community_metric_index"].append(community_metric_index)
-            x_dict["price_vector"].append(price_vector)
+            row_tensor = torch.cat(
+                [article_matrix, community_matrix, community_metric_index, price_vector],
+                dim=1
+            )
 
-        article_tensor = torch.cat(x_dict["article_matrix"], dim=0)
-        article_tensor = self.dim_fix(article_tensor, self.config["article_row_len"])
-        community_tensor = torch.cat(x_dict["community_matrix"], dim=0)
-        community_tensor = self.dim_fix(
-            community_tensor, self.config["community_row_len"]
-        )
+            data_lt.append(row_tensor)
+        
+        row_lt = []
+        for row in divide_chunks(data_lt, self.config['bundle_size']):
+            row_lt.append(
+                torch.stack(row)
+                )
 
-        community_metric_index = torch.tensor(x_dict["community_metric_index"]).view(-1, 1)
-        market_index = torch.tensor(x_dict['price_vector'])
+        self.feature_tensor = torch.stack(data_lt)
+        self.target_tensor = torch.tensor(pd.get_dummies(self.df['Label']).values)
 
     def __len__(self):
-        return len(self.df)
+        return len(self.feature_tensor)
 
     def __getitem__(self, index):
-        x = self.df.iloc[index, :-1]
-        y = self.df.iloc[index, -1]
-        return x, y
+        return (self.feature_tensor[index], self.target_tensor[index])
