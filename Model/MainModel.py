@@ -48,7 +48,7 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        pass
+        pass        
 
         # In Neural Network
         article_tensor = self.article_cnn(article_tensor)
