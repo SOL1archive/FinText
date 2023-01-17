@@ -48,7 +48,10 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-
+        article_tensor = x[0]
+        community_tensor = x[1]
+        community_metric_index = x[2]
+        price_index = x[3]
 
         # In Neural Network
         article_tensor = self.article_cnn(article_tensor)
@@ -56,14 +59,14 @@ class FinTextModel(nn.Module):
         community_tensor = self.community_cnn(community_tensor)
         community_metric_index = self.community_metric_ffn(community_metric_index)
         
-        market_index = self.gru(market_index)
+        price_index = self.gru(price_index)
 
         total_out = torch.cat(
             [
                 nn.Flatten(article_tensor), 
                 nn.Flatten(community_tensor),
                 community_metric_index,
-                market_index
+                price_index
             ], dim=0
         )
 

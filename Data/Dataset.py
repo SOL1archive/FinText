@@ -102,7 +102,7 @@ class FinTextDataset(Dataset):
         
         def make_chunk_and_stack(data_lt):
             row_lt = []
-            for row in divide_chunks(feature_lt, self.config['bundle_size']):
+            for row in divide_chunks(data_lt, self.config['bundle_size']):
                 row_lt.append(
                     torch.stack(row)
                     )
