@@ -6,7 +6,7 @@ from transformers import ElectraTokenizer, ElectraModel
 
 def CNN_Layer(in_channels, out_channels, kernel_size, stride, padding):
     return nn.Sequential(
-        nn.Conv2d(
+        nn.Conv3d(
             in_channels=in_channels, 
             out_channels=out_channels, 
             kernel_size=kernel_size,

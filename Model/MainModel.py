@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils import CNN_Layer
+from Model.utils import CNN_Layer
 
 class FinTextModel(nn.Module):
     def __init__(self):
@@ -10,11 +10,11 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = CNN_Layer(
-            in_channels=1, out_channels=10, kernel_size=(9, 3), stride=1, padding=(4, 1)
+            in_channels=1, out_channels=10, kernel_size=(3, 3, 9), stride=1, padding=(4, 1)
         )
 
         self.article_cnn = CNN_Layer(
-            in_channels=1, out_channels=10, kernel_size=(9, 3), stride=1, padding=(4, 1)
+            in_channels=1, out_channels=10, kernel_size=(3, 3, 9), stride=1, padding=(4, 1)
         )
 
         self.community_metric_ffn = nn.Sequential(
@@ -48,7 +48,7 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        pass        
+
 
         # In Neural Network
         article_tensor = self.article_cnn(article_tensor)
@@ -71,3 +71,4 @@ class FinTextModel(nn.Module):
         total_out = self.softmax(total_out)
 
         return total_out
+        
