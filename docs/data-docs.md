@@ -30,4 +30,5 @@
 - `dim_fix(self, tensor, row_len) -> torch.tensor`: \
     행렬의 행의 길이가 `row_len`과 다를 때 행의 길이를 `row_len`에 맞춤. 행의 길이가 `row_len`보다 적을 경우 0 padding을 수행하고, 많을 경우 차원 축소 기법을 사용함. `config`를 통해 차원 축소 기법을 지정할 수 있음. 지원하는 차원 축소 기법으로는 `SVD`, `PCA`, `NMF`가 있음.
 
-# Dataloader
+# DataLoader
+초기 변수 입력이 불편할 경우를 위해 만들어놓음. 따라서 데이터로더를 생성시 번거롭게 모든 변수를 다 입력할 필요가 없음.
