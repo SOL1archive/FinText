@@ -28,10 +28,8 @@ class FinTextModel(nn.Module):
         )
 
         self.gru = nn.Sequential(
-            nn.GRU(input_size=4, hidden_size=10, num_layers=5)
+            nn.GRU(input_size=4, hidden_size=10, num_layers=5, batch_first=True)
         )
-
-        self.hidden_init_state = torch.zeros()
 
         self.total_ffn = nn.Sequential(
             nn.Linear(in_features=10000, out_features=10000),
