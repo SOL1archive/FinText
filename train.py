@@ -59,7 +59,7 @@ class TrainingApp:
     def prepare_model(self):
         self.model = FinTextModel()
         if self.use_cuda:
-            log.info(f"Using CUDA; {torch.cuda.device_count()} devices.")
+            log.info(f"Using CUDA: {torch.cuda.device_count()} devices.")
             if torch.cuda.device_count() > 1:
                 self.model = nn.DataParallel(self.model)
             self.model = self.model.to(self.device)
@@ -77,6 +77,7 @@ class TrainingApp:
         self.optimizer = Adam(self.model.parameters(), lr=self.config["lr"])
 
     def train(self):
+        log.info(f'Start Training: {self.time_str}')
         criterion = nn.CrossEntropyLoss().to(self.device)
 
         for epoch in range(self.num_epoch):
@@ -93,7 +94,9 @@ class TrainingApp:
                 loss.backward()
                 self.optimizer.step()
 
-            print(f"EPOCH: {epoch}, Training Loss {loss.item():.4f}")
+            msg = f"EPOCH: {epoch}, Training Loss {loss.item():.5f}"
+            print(msg)
+            log.info(msg)
 
             #validation/test
             with torch.no_grad():
@@ -106,6 +109,7 @@ class TrainingApp:
                 self.test_writer.add_scalar('avg loos/test', avg_test_loss, epoch)
                 self.test_writer.add_scalar('total loss/test', total_test_loss, epoch)
 
+        log.info(f'End Training {datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")}')
         self.train_writer.flush()
         self.test_writer.flush()
 
@@ -122,7 +126,7 @@ class TrainingApp:
         if save_model.upper() == "Y":
             torch.save(
                 self.model,
-                f"./model-dir/{self.datetime.strftime('%d_%b_%Y_%H:%M:%S')}.model",
+                f"./model-dir/{datetime.datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.model",
             )
 
         try:
