@@ -5,7 +5,7 @@ import pandas as pd
 
 import torch
 import torch.nn as nn
-from torch.optim import Adam
+import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 
 from Data.Dataset import FinTextDataset
@@ -14,20 +14,27 @@ from Model.MainModel import FinTextModel
 from utils import concat_dataset
 
 log = logging.getLogger(__name__)
+stream_hander = logging.StreamHandler()
+log.addHandler(stream_hander)
+
+file_handler = logging.FileHandler('./log/train-test.log')
+log.addHandler(file_handler)
 
 # log.setLevel(logging.WARN)
 log.setLevel(logging.INFO)
 log.setLevel(logging.DEBUG)
 
-class TrainingApp:
+class TrainTestApp:
     def __init__(self, **config):
         default_config = {
             "num_epoch": 30,
             "lr": 0.001,
+            'lr_scheduler': None,
             "df_list": [
                 pd.read_csv("./data-dir/kakao.xlsx"),
                 pd.read_csv("./data-dir/spc.xlsx"),
             ],
+            'train_size': 0.8
         }
 
         for key in default_config.keys():
@@ -37,6 +44,12 @@ class TrainingApp:
         self.config = config
         self.df_list = self.config["df_list"]
         self.num_epoch = self.config["num_epoch"]
+        self.lr = self.config['lr']
+        self.train_size = self.config['train_size']
+        if self.config['lr_scheduler'] is None:
+            self.lr_lambda = lambda epoch: self.lr
+        else:
+            self.lr_lambda = self.config['lr_scheduler']
 
         self.use_cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.use_cuda else "cpu")
@@ -47,10 +60,14 @@ class TrainingApp:
 
         self.time_str = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
+        self.prepare_dataset()
+        self.prepare_dataloader()
+
     def prepare_dataset(self):
         self.dataset = concat_dataset(self.df_list)
-        self.dataset.to(self.device)
-        self.train_dataset, self.test_dataset = self.dataset.train_test_split()
+        #만약 전체 데이터셋을 GPU device에 올릴 수 있는 경우 다음 주석 해제
+        #self.dataset.to(self.device)
+        self.train_dataset, self.test_dataset = self.dataset.train_test_split(self.train_size)
 
     def prepare_dataloader(self):
         self.train_dataloader = FinTextDataLoader(self.train_dataset)
@@ -74,7 +91,13 @@ class TrainingApp:
                 log_dir=log_dir + 'test_cls')
 
     def prepare_optimizer(self):
-        self.optimizer = Adam(self.model.parameters(), lr=self.config["lr"])
+        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        self.scheduler = optim.lr_scheduler.LambdaLR(
+            optimizer=self.optimizer,
+            lr_lambda=self.lr_lambda,
+            last_epoch=-1,                            
+            verbose=False
+        )
 
     def train(self):
         log.info(f'Start Training: {self.time_str}')
@@ -94,6 +117,8 @@ class TrainingApp:
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+
+            self.scheduler.step()
 
             msg = f"EPOCH: {epoch}, Training Loss {loss.item():.5f}"
             print(msg)
@@ -116,8 +141,6 @@ class TrainingApp:
         self.test_writer.flush()
 
     def main(self):
-        self.prepare_dataset()
-        self.prepare_dataloader()
         self.prepare_model()
         self.prepare_tensorboard_writer()
         self.prepare_optimizer()
@@ -139,4 +162,4 @@ class TrainingApp:
             self.test_writer.close()
 
 if __name__ == "__main__":
-    TrainingApp().main()
+    TrainTestApp().main()
