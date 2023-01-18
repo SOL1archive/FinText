@@ -19,12 +19,6 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 log.setLevel(logging.DEBUG)
 
-METRICS_LABEL_NDX = 0
-METRICS_PRED_NDX = 1
-METRICS_LOSS_NDX = 2
-METRICS_SIZE = 3
-
-
 class TrainingApp:
     def __init__(self, **config):
         default_config = {
@@ -47,8 +41,8 @@ class TrainingApp:
         self.use_cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.use_cuda else "cpu")
 
-        self.trn_writer = None
-        self.val_writer = None
+        self.train_writer = None
+        self.test_writer = None
         self.totalTrainingSamples_count = 0
 
         self.time_str = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
@@ -56,16 +50,28 @@ class TrainingApp:
     def prepare_dataset(self):
         self.dataset = concat_dataset(self.df_list)
         self.dataset.to(self.device)
+        self.train_dataset, self.test_dataset = self.dataset.train_test_split()
 
-        self.dataloader = FinTextDataLoader(self.dataset)
+    def prepare_dataloader(self):
+        self.train_dataloader = FinTextDataLoader(self.train_dataset)
+        self.test_dataloader = FinTextDataLoader(self.test_dataset)
 
     def prepare_model(self):
         self.model = FinTextModel()
         if self.use_cuda:
-            log.info("Using CUDA; {} devices.".format(torch.cuda.device_count()))
+            log.info(f"Using CUDA; {torch.cuda.device_count()} devices.")
             if torch.cuda.device_count() > 1:
                 self.model = nn.DataParallel(self.model)
             self.model = self.model.to(self.device)
+
+    def prepare_tensorboard_writer(self):
+        if self.train_writer is None:
+            log_dir = f'./runs/{self.time_str}/'
+
+            self.train_writer = SummaryWriter(
+                log_dir=log_dir + 'train_cls')
+            self.test_writer = SummaryWriter(
+                log_dir=log_dir + 'test_cls')
 
     def prepare_optimizer(self):
         self.optimizer = Adam(self.model.parameters(), lr=self.config["lr"])
@@ -74,13 +80,13 @@ class TrainingApp:
         criterion = nn.CrossEntropyLoss().to(self.device)
 
         for epoch in range(self.num_epoch):
-            for i, (input_tensor, labels) in enumerate(self.dataloader):
+            for i, (input_tensor, labels) in enumerate(self.train_dataloader):
                 # Forward
                 input_tensor = input_tensor.to(self.device)
                 output_tensor = self.model(input_tensor)
 
                 loss = criterion(output_tensor, labels)
-                self.writer.add_scalar()
+                self.train_writer.add_scalar("Loss/train", loss.item(), epoch)
 
                 # Backward
                 self.optimizer.zero_grad()
@@ -89,12 +95,27 @@ class TrainingApp:
 
             print(f"EPOCH: {epoch}, Training Loss {loss.item():.4f}")
 
-        self.writer.flush()
+            #validation/test
+            with torch.no_grad():
+                total_test_loss = 0
+                for i, (input_tensor, labels) in enumerate(self.test_dataloader):
+                    outputs = self.model(input_tensor)
+                    test_loss = self.loss(outputs, labels)
+                    total_test_loss += test_loss.item()
+                avg_test_loss = total_test_loss / len(self.test_dataloader)
+                self.test_writer.add_scalar('avg loos/test', avg_test_loss, epoch)
+                self.test_writer.add_scalar('total loss/test', total_test_loss, epoch)
+
+        self.train_writer.flush()
+        self.test_writer.flush()
 
     def main(self):
         self.prepare_dataset()
+        self.prepare_dataloader()
         self.prepare_model()
+        self.prepare_tensorboard_writer()
         self.prepare_optimizer()
+
         self.train()
 
         save_model = input("Save Model(Y/N)? ")
@@ -108,7 +129,8 @@ class TrainingApp:
             print("Press Ctrl + C to turn off the TensorBoard")
             _ = input()
         except KeyboardInterrupt:
-            self.writer.close()
+            self.train_writer.close()
+            self.test_writer.close()
 
 if __name__ == "__main__":
     TrainingApp().main()
