@@ -16,7 +16,7 @@ class TrainingApp:
         self.datetime = datetime.datetime.now()
 
     def prepare_dataset(self):
-        self.dataset = FinTextDataset()
+        self.dataset = FinTextDataset().to(self.device)
         self.dataloader = FinTextDataLoader(self.dataset)
 
     def prepare_model(self):

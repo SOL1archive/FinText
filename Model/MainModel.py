@@ -44,10 +44,10 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        article_tensor = x[:, 0, :, :, :]
-        community_tensor = x[:, 1, :, :, :]
-        community_metric_index = x[:, 2]
-        price_index = x[:, 3, :].unsqeeze(0)
+        article_tensor = x['article_tensor']
+        community_tensor = x['community_tensor']
+        community_metric_index = x['community_metric_index']
+        price_index = x['price_index']
 
         # In Neural Network
         article_tensor = self.article_cnn(article_tensor)

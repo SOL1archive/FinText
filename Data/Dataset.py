@@ -81,16 +81,16 @@ class FinTextDataset(Dataset):
         kc_model = ElectraModel.from_pretrained("beomi/KcELECTRA-base-v2022").to(self.device)
 
         row_dict = dict()
-        row_dict['article_matrix'] = []
+        row_dict['article_tensor'] = []
         row_dict['community_matrix'] = []
         row_dict['community_metric_index'] = []
-        row_dict['price_vector'] = []
+        row_dict['price_index'] = []
 
         for _, period in self.feature_df.iterrows():
-            article_matrix = embed_text(
+            article_tensor = embed_text(
                 period["ArticleText"], ko_tokenizer, ko_model
             )
-            article_matrix = dim_fix(article_matrix, self.config['article_row_len'])
+            article_tensor = dim_fix(article_tensor, self.config['article_row_len'])
 
             community_matrix = embed_text(
                 period["CommunityText"], kc_tokenizer, kc_model
@@ -99,14 +99,14 @@ class FinTextDataset(Dataset):
             
             community_metric_index = torch.tensor(period["MetricIndex"])
 
-            price_vector = torch.tensor(
+            price_index = torch.tensor(
                 [period["Open"], period["High"], period["Low"], period["Close"]]
             )
 
-            row_dict['article_matrix'].append(article_matrix)
+            row_dict['article_tensor'].append(article_tensor)
             row_dict['community_matrix'].append(community_matrix)
             row_dict['community_metric_index'].append(community_metric_index)
-            row_dict['price_vector'].append(price_vector)
+            row_dict['price_index'].append(price_index)
         
         def make_chunk_and_stack(data_lt):
             row_lt = []
@@ -124,6 +124,12 @@ class FinTextDataset(Dataset):
         self.target_tensor = torch.tensor(
             pd.get_dummies(self.df['Label']).values[0:-1:self.config['bundle_size']]
         )
+
+    def to(self, device):
+        self.target_tensor.to(device)
+        for _, row in self.feature_df.iterrows():
+            for item in row:
+                item.to(device)
 
     def __len__(self):
         return len(self.feature_df)
