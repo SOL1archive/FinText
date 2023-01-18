@@ -39,7 +39,7 @@ class StdCNN3d(nn.Module):
         return x
 
 def CNN_Layer(in_channels, out_channels, kernel_size, stride, padding):
-    return nn.Sequential(
+    net = nn.Sequential(
         nn.Conv3d(
             in_channels=in_channels, 
             out_channels=out_channels, 
@@ -51,3 +51,5 @@ def CNN_Layer(in_channels, out_channels, kernel_size, stride, padding):
         nn.ReLU(),
         nn.MaxPool3d(kernel_size=kernel_size)
     )
+
+    return net
