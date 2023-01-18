@@ -82,6 +82,7 @@ class TrainingApp:
 
         for epoch in range(self.num_epoch):
             for i, (input_tensor, labels) in enumerate(self.train_dataloader):
+                self.model.train()
                 # Forward
                 input_tensor = input_tensor.to(self.device)
                 output_tensor = self.model(input_tensor)
@@ -100,6 +101,7 @@ class TrainingApp:
 
             #validation/test
             with torch.no_grad():
+                self.model.eval()
                 total_test_loss = 0
                 for i, (input_tensor, labels) in enumerate(self.test_dataloader):
                     outputs = self.model(input_tensor)
