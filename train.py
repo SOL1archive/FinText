@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
 from torch.optim import Adam
 from torch.utils.tensorboard import SummaryWriter
 
@@ -8,34 +7,48 @@ from Data.Dataset import FinTextDataset
 from Data.DataLoader import FinTextDataLoader
 from Model.MainModel import FinTextModel
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-writer = SummaryWriter()
+class TrainingApp:
+    def __init__(self):
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.writer = SummaryWriter(log_dir='./runs')
 
-dataset = Dataset()
-dataloader = FinTextDataLoader(dataset)
+    def prepare_dataset(self):
+        self.dataset = FinTextDataset()
+        self.dataloader = FinTextDataLoader(self.dataset)
 
-model = FinTextModel().to(device)
+    def prepare_model(self):
+        self.model = FinTextModel().to(self.device)
 
-criterion = nn.CrossEntropyLoss().to(device)
-optimizer = Adam(model.parameters())
+    def train(self):
+        criterion = nn.CrossEntropyLoss().to(self.device)
+        optimizer = Adam(self.model.parameters())
 
-for epoch in range(dataloader):
-    for i, (input_tensor, labels) in enumerate(dataloader):
-        # Forward
-        input_tensor = input_tensor.to(device)
-        output_tensor = model(input_tensor)
-        loss = criterion(output_tensor, labels)
+        for epoch in range(self.dataloader):
+            for i, (input_tensor, labels) in enumerate(self.dataloader):
+                # Forward
+                input_tensor = input_tensor.to(self.device)
+                output_tensor = self.model(input_tensor)
+                
+                loss = criterion(output_tensor, labels)
+                self.writer.add_scalar()
 
-        # Backward
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+                # Backward
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-writer.flush()
+        self.writer.flush()
 
-try:
-    print('Press Ctrl + C to turn off the TensorBoard')
-    _ = input()
-except KeyboardInterrupt:
-    writer.close()
-    
+    def main(self):
+        self.prepare_dataset()
+        self.prepare_model()
+        self.train()
+
+        try:
+            print('Press Ctrl + C to turn off the TensorBoard')
+            _ = input()
+        except KeyboardInterrupt:
+            self.writer.close()
+
+if __name__ == '__main__':
+    TrainingApp().main()
