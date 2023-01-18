@@ -1,3 +1,5 @@
+import datetime
+
 import torch
 import torch.nn as nn
 from torch.optim import Adam
@@ -11,6 +13,7 @@ class TrainingApp:
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.writer = SummaryWriter(log_dir='./runs')
+        self.datetime = datetime.datetime.now()
 
     def prepare_dataset(self):
         self.dataset = FinTextDataset()
@@ -37,12 +40,21 @@ class TrainingApp:
                 loss.backward()
                 optimizer.step()
 
+            print(f'EPOCH: {epoch}, Training Loss {loss.item():.4f}')
+
         self.writer.flush()
 
     def main(self):
         self.prepare_dataset()
         self.prepare_model()
         self.train()
+
+        save_model = input('Save Model(Y/N)? ')
+        if save_model.upper() == 'Y':
+            torch.save(
+                self.model, 
+                f"./model-dir/{self.datetime.strftime('%d_%b_%Y_%H:%M:%S')}.model"
+            )
 
         try:
             print('Press Ctrl + C to turn off the TensorBoard')
