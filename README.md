@@ -26,3 +26,4 @@
 |scikit-learn|1.1.3|
 |seaborn|0.12.1|
 |matplotlib|3.6.2|
+|tensorboard|2.11.0|
