@@ -20,11 +20,11 @@ criterion = nn.CrossEntropyLoss().to(device)
 optimizer = Adam(model.parameters())
 
 for epoch in range(dataloader):
-    for i, (input, labels) in enumerate(dataloader):
+    for i, (input_tensor, labels) in enumerate(dataloader):
         # Forward
-        input = input.to(device)
-        output = model(input)
-        loss = criterion(output, labels)
+        input_tensor = input_tensor.to(device)
+        output_tensor = model(input_tensor)
+        loss = criterion(output_tensor, labels)
 
         # Backward
         optimizer.zero_grad()
@@ -32,3 +32,10 @@ for epoch in range(dataloader):
         optimizer.step()
 
 writer.flush()
+
+try:
+    print('Press Ctrl + C to turn off the TensorBoard')
+    _ = input()
+except KeyboardInterrupt:
+    writer.close()
+    
