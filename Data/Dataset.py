@@ -153,9 +153,9 @@ class FinTextDataset(Dataset):
             for item in row:
                 item.to(device)
 
-    def train_test_split(self, frac=0.80):
+    def train_test_split(self, train_size=0.80):
         train_index, test_index = train_test_split(
-            range(len(self.feature_df)), train_size=frac
+            range(len(self.feature_df)), train_size=train_size
         )
 
         train_feature = self.feature_df.iloc[train_index]
@@ -182,4 +182,4 @@ class FinTextDataset(Dataset):
         return len(self.feature_df)
 
     def __getitem__(self, index):
-        return (self.feature_df.loc[index], self.target_tensor[index])
+        return (self.feature_df.iloc[index], self.target_tensor[index])
