@@ -141,6 +141,12 @@ class TrainTestApp:
         self.train_writer.flush()
         self.test_writer.flush()
 
+    def save_model(self):
+        torch.save(
+                self.model,
+                f"./model-dir/{datetime.datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.model",
+            )
+
     def main(self):
         self.prepare_model()
         self.prepare_tensorboard_writer()
@@ -150,10 +156,7 @@ class TrainTestApp:
 
         save_model = input("Save Model(Y/N)? ")
         if save_model.upper() == "Y":
-            torch.save(
-                self.model,
-                f"./model-dir/{datetime.datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.model",
-            )
+            self.save_model()
 
         try:
             print("Press Ctrl + C to turn off the TensorBoard")
