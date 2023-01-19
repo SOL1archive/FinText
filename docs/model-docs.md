@@ -18,7 +18,7 @@
 텐서의 각 출력 차원에 대해,
         
 $$
-\frac{\text{input\_size} - \text{kernel\_size} + 2\ \text{padding}}{\text{stride}} + 1
+\frac{\text{input size} - \text{kernel size} + 2\ \text{padding}}{\text{stride}} + 1
 $$
 
 python 인터프리터에 대입할 때 다음 식을 사용하면 좋음
