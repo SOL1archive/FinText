@@ -29,7 +29,7 @@ class FinTextModel(nn.Module):
         self.gru = GRU(input_size=4, hidden_size=10, output_size=4, num_layers=5)
             
         self.total_ffn = nn.Sequential(
-            nn.Linear(in_features=10000, out_features=10000),
+            nn.Linear(in_features=10000, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
             nn.ReLU(),
             nn.Linear(in_features=10000, out_features=7000),
             nn.ReLU(),
@@ -38,7 +38,7 @@ class FinTextModel(nn.Module):
         )
 
         self.softmax = nn.Sequential(
-            nn.Linear(in_features=5000, out_features=4), nn.Softmax(dim=10)
+            nn.Linear(in_features=5000, out_features=10), nn.Softmax(dim=2)
         )
 
     def forward(self, x):
