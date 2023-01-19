@@ -9,11 +9,19 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = CNN_Layer(
-            in_channels=1, out_channels=10, kernel_size=(3, 9, 3), stride=1, padding=(4, 1)
+            in_channels=1, 
+            out_channels=10, 
+            kernel_size=(3, 9, 3), 
+            stride=1, 
+            padding=(4, 1)
         )
 
         self.article_cnn = CNN_Layer(
-            in_channels=1, out_channels=10, kernel_size=(3, 9, 3), stride=1, padding=(4, 1)
+            in_channels=1, 
+            out_channels=10, 
+            kernel_size=(3, 9, 3), 
+            stride=1, 
+            padding=(4, 1)
         )
 
         self.community_metric_ffn = nn.Sequential(
@@ -23,10 +31,16 @@ class FinTextModel(nn.Module):
         )
 
         self.community_ffn = nn.Sequential(
-            nn.Linear(in_features=1, out_features=1), nn.ReLU()
+            nn.Linear(in_features=1, out_features=1), 
+            nn.ReLU()
         )
 
-        self.gru = GRU(input_size=4, hidden_size=10, output_size=4, num_layers=5)
+        self.gru = GRU(
+            input_size=4, 
+            hidden_size=10, 
+            output_size=4, 
+            num_layers=5
+        )
             
         self.total_ffn = nn.Sequential(
             nn.Linear(in_features=10000, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
@@ -38,7 +52,8 @@ class FinTextModel(nn.Module):
         )
 
         self.softmax = nn.Sequential(
-            nn.Linear(in_features=5000, out_features=10), nn.Softmax(dim=2)
+            nn.Linear(in_features=5000, out_features=10), 
+            nn.Softmax(dim=2)
         )
 
     def forward(self, x):
