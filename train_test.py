@@ -8,16 +8,16 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 
-from Data.Dataset import FinTextDataset
+from Data.Dataset import FinTextDataset, concat_dataset
 from Data.DataLoader import FinTextDataLoader
 from Model.MainModel import FinTextModel
-from utils import concat_dataset
 
 log = logging.getLogger(__name__)
 stream_hander = logging.StreamHandler()
 log.addHandler(stream_hander)
 
-file_handler = logging.FileHandler('./log/train-test.log')
+log_dir = __file__[:__file__.rfind('/')]
+file_handler = logging.FileHandler(log_dir + '/log/train-test.log')
 log.addHandler(file_handler)
 
 # log.setLevel(logging.WARN)

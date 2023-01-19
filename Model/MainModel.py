@@ -9,11 +9,11 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = CNN_Layer(
-            in_channels=1, out_channels=10, kernel_size=(3, 9, 9), stride=1, padding=(4, 1)
+            in_channels=1, out_channels=10, kernel_size=(3, 9, 3), stride=1, padding=(4, 1)
         )
 
         self.article_cnn = CNN_Layer(
-            in_channels=1, out_channels=10, kernel_size=(3, 9, 9), stride=1, padding=(4, 1)
+            in_channels=1, out_channels=10, kernel_size=(3, 9, 3), stride=1, padding=(4, 1)
         )
 
         self.community_metric_ffn = nn.Sequential(
@@ -49,20 +49,20 @@ class FinTextModel(nn.Module):
         price_index = x['price_index']
 
         # In Neural Network
-        print(article_tensor.shape)
         article_tensor = self.article_cnn(article_tensor)
-        print(article_tensor.shape)
-
-        print(community_tensor)
         community_tensor = self.community_cnn(community_tensor)
-        print(community_tensor)
-        print(community_metric_index)
-        community_metric_index = self.community_metric_ffn(community_metric_index)
-        print(community_metric_index)
 
-        print(price_index)
+        community_metric_index = self.community_metric_ffn(community_metric_index)
+
         price_index, _ = self.gru(price_index)
-        print(price_index)
+
+        r'''
+        output tensor dimension 계산공식:
+        python: 파이썬 인터프리터에 대입해서 쉽게 연산하고 싶을 떄 사용)
+            int((input_size - kernel_size + 2 * padding) / stride) + 1
+        LaTeX: 시각적으로 수식을 볼때 사용)
+            $\frac{input_size - kernel_size + 2padding}{stride} + 1$
+        '''
 
         total_out = torch.cat(
             [
