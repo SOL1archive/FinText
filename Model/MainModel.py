@@ -13,7 +13,7 @@ class FinTextModel(nn.Module):
             out_channels=10, 
             kernel_size=(3, 9, 3), 
             stride=1, 
-            padding=(4, 1)
+            padding=(1, 4, 1)
         )
 
         self.article_cnn = CNN_Layer(
@@ -21,7 +21,7 @@ class FinTextModel(nn.Module):
             out_channels=10, 
             kernel_size=(3, 9, 3), 
             stride=1, 
-            padding=(4, 1)
+            padding=(1, 4, 1)
         )
 
         self.community_metric_ffn = nn.Sequential(
