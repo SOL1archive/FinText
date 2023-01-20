@@ -141,6 +141,7 @@ class TrainTestApp:
                     total_cnt += labels.size(0)
                     accurate_pred += (pred == labels).sum().item()
                     positive_cnt += (pred == 1).sum().item()
+                    
                 avg_test_loss = total_test_loss / len(self.test_dataloader)
                 self.test_writer.add_scalar('avg loss/test', avg_test_loss, epoch)
                 accuracy = 100 * accurate_pred / total_cnt
