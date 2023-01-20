@@ -1,9 +1,8 @@
 # Data Columns
 | Name            | Type        | Description                    |
 | --------------- | ----------- | ------------------------------ |
-| `StartDateTime` | `datetime`  | 날짜 구간 시작 시각             |
-| `EndDateTime`   | `datetime`  | 날짜 구간 끝 시각               |
-| `ArticleText`    | `list(str)` | 구간 내 기사들의 리스트         |
+| `DayIndex`      | `str`       | 날짜 구간 시작 시각             |
+| `ArticleText`   | `list(str)` | 구간 내 기사들의 리스트         |
 | `CommunityText` | `list(str)` | 구간 내 커뮤니티 글들의 리스트   |
 | `MetricIndex`   | `list(str)` | 커뮤티니 글들에 대한 평가 지표   |
 | `Open`          | `float32`   | 시가                           |
