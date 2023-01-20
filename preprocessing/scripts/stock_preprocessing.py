@@ -38,7 +38,7 @@ new_df = group['Open'].first()
 new_df['High'] = group['High'].max()['High']
 new_df['Low'] = group['Low'].min()['Low']
 new_df['Close'] = group['Close'].last()['Close']
-new_df.set_index('DayIndex')
+new_df = new_df.set_index('DayIndex')
 new_df.head()
 
 # %%
