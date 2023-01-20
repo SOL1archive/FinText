@@ -128,14 +128,25 @@ class TrainTestApp:
             #validation/test
             with torch.no_grad():
                 self.model.eval()
-                total_test_loss = 0
+                total_test_loss = 0.
+                total_cnt = 0.
+                positive_cnt = 0.
+                accurate_pred = 0.
                 for i, (input_tensor, labels) in enumerate(self.test_dataloader):
                     outputs = self.model(input_tensor)
                     test_loss = self.loss(outputs, labels)
                     total_test_loss += test_loss.item()
+                    
+                    _, pred = torch.max(outputs.data, 1)
+                    total_cnt += labels.size(0)
+                    accurate_pred += (pred == labels).sum().item()
+                    positive_cnt += (pred == 1).sum().item()
                 avg_test_loss = total_test_loss / len(self.test_dataloader)
-                self.test_writer.add_scalar('avg loos/test', avg_test_loss, epoch)
-                self.test_writer.add_scalar('total loss/test', total_test_loss, epoch)
+                self.test_writer.add_scalar('avg loss/test', avg_test_loss, epoch)
+                accuracy = 100 * accurate_pred / total_cnt
+                precision = 100 * accurate_pred / positive_cnt
+                self.test_writer.add_scalar('accuracy', accuracy, epoch)
+                self.test_writer.add_scalar('precision', precision, epoch)
 
         log.info(f'End Training {datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")}')
         self.train_writer.flush()
