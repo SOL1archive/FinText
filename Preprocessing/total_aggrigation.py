@@ -4,9 +4,9 @@ import pickle
 import pandas as pd
 
 # %%
-article_df = pd.read_excel('./kakao-article-preprocessed.xlsx')
-community_df = pd.read_excel('./kakao-community-preprocessed.xlsx')
-stock_df = pd.read_excel('./kakao-stock-preprocessed.xlsx')
+article_df = pd.read_excel('../data-dir/kakao-article-preprocessed.xlsx')
+community_df = pd.read_excel('../data-dir/kakao-community-preprocessed.xlsx')
+stock_df = pd.read_excel('../data-dir/kakao-stock-preprocessed.xlsx')
 total_df = pd.DataFrame()
 
 # %%
@@ -31,9 +31,4 @@ total_df = total_df.dropna(axis=0)
 total_df.head()
 
 # %%
-raise RuntimeError
-
-# %%
-total_df.to_pickle('data-df.pkl')
-
-
+total_df.to_pickle('../data-dir/data-df.pkl')

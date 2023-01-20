@@ -4,8 +4,8 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 # %%
-df_article = pd.read_excel('./kakao-text-data.xlsx', sheet_name='article')
-df_community = pd.read_excel('./kakao-text-data.xlsx', sheet_name='community')
+df_article = pd.read_excel('../data-dir/kakao-text-data.xlsx', sheet_name='article')
+df_community = pd.read_excel('../data-dir/kakao-text-data.xlsx', sheet_name='community')
 
 # %%
 df_article = df_article.iloc[::-1].reset_index().drop('index', axis=1)
@@ -139,7 +139,5 @@ df_community = df_community.rename(columns={'text': 'CommunityText'})
 df_article = df_article.rename(columns={'text': 'ArticleText'})
 
 # %%
-df_article.to_excel('kakao-article-preprocessed.xlsx')
-df_community.to_excel('kakao-community-preprocessed.xlsx')
-
-
+df_article.to_excel('../data-dir/kakao-article-preprocessed.xlsx')
+df_community.to_excel('../data-dir/kakao-community-preprocessed.xlsx')

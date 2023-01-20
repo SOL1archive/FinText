@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 # %%
-df = pd.read_excel('./kakao-market-price.xlsx')
+df = pd.read_excel('../data-dir/kakao-market-price.xlsx')
 df = df.rename(columns={'Datetime(2022-10-13)': 'Date'})
 df.head()
 
@@ -61,6 +61,4 @@ new_df['Close'] = scaler.transform(new_df['Close'].to_numpy().reshape(-1, 1))
 new_df.head()
 
 # %%
-new_df.to_excel('kakao-stock-preprocessed.xlsx')
-
-
+new_df.to_excel('../data-dir/kakao-stock-preprocessed.xlsx')
