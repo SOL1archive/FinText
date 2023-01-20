@@ -131,7 +131,12 @@ df_community.head()
 
 # %%
 df_community['MetricIndex'] = (df_community['good'] - df_community['bad']) / df_community['view']
+#df_community['MetricIndex'] = MinMaxScaler((-0.5, 0.5)).fit_transform(df_community['MetricIndex'].values.reshape(1,-1)).reshape(-1, 1)
+df_community = df_community.drop(['view', 'good', 'bad'], axis=1)
 
+# %%
+df_community = df_community.rename(columns={'text': 'CommunityText'})
+df_article = df_article.rename(columns={'text': 'ArticleText'})
 
 # %%
 df_article.to_excel('kakao-article-preprocessed.xlsx')
