@@ -17,7 +17,6 @@ class FinTextDataset(Dataset):
         device = torch.device("cpu")
 
         default_config = {
-            "article_row_len": 5000,  # 조정될 필요 있음
             "community_row_len": 1000,
             "decomposition_method": "SVD",
             "bundle_size": 15,
@@ -87,12 +86,6 @@ class FinTextDataset(Dataset):
 
         feature_df = df.drop("Label", axis=1)
 
-        ko_tokenizer = ElectraTokenizer.from_pretrained(
-            "monologg/koelectra-base-v3-discriminator"
-        )
-        ko_model = ElectraModel.from_pretrained(
-            "monologg/koelectra-base-v3-discriminator"
-        ).to(device)
         kc_tokenizer = ElectraTokenizer.from_pretrained(
             "beomi/KcELECTRA-base-v2022"
         )
@@ -101,14 +94,11 @@ class FinTextDataset(Dataset):
         ).to(device)
 
         row_dict = dict()
-        row_dict["article_tensor"] = []
         row_dict["community_tensor"] = []
         row_dict["community_metric_index"] = []
         row_dict["price_index"] = []
 
         for _, period in feature_df.iterrows():
-            article_tensor = embed_text(period["ArticleText"], ko_tokenizer, ko_model)
-            article_tensor = dim_fix(article_tensor, self.config["article_row_len"])
 
             community_tensor = embed_text(
                 period["CommunityText"], kc_tokenizer, kc_model
@@ -123,7 +113,6 @@ class FinTextDataset(Dataset):
                 [period["Open"], period["High"], period["Low"], period["Close"]]
             )
 
-            row_dict["article_tensor"].append(article_tensor)
             row_dict["community_tensor"].append(community_tensor)
             row_dict["community_metric_index"].append(community_metric_index)
             row_dict["price_index"].append(price_index)

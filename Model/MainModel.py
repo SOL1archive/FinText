@@ -16,14 +16,6 @@ class FinTextModel(nn.Module):
             padding=(1, 4, 1)
         )
 
-        self.article_cnn = CNN_Layer(
-            in_channels=1, 
-            out_channels=10, 
-            kernel_size=(3, 9, 3), 
-            stride=1, 
-            padding=(1, 4, 1)
-        )
-
         self.community_metric_ffn = nn.Sequential(
             nn.Linear(in_features=1, out_features=1, bias=False),
             nn.BatchNorm1d(num_features=1),
@@ -58,13 +50,11 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        article_tensor = x['article_tensor']
         community_tensor = x['community_tensor']
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
 
         # In Neural Network
-        article_tensor = self.article_cnn(article_tensor)
         community_tensor = self.community_cnn(community_tensor)
 
         community_metric_index = self.community_metric_ffn(community_metric_index)
@@ -81,7 +71,6 @@ class FinTextModel(nn.Module):
 
         total_out = torch.cat(
             [
-                nn.Flatten(article_tensor), 
                 nn.Flatten(community_tensor),
                 community_metric_index,
                 price_index
