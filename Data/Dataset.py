@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
@@ -10,15 +12,26 @@ from transformers import ElectraTokenizer, ElectraModel
 
 from utils import *
 
+log = logging.getLogger(__name__)
+stream_hander = logging.StreamHandler()
+log.addHandler(stream_hander)
+
+file_handler = logging.FileHandler('/home/thesol1/projects/FinText/log/dataset.log')
+log.addHandler(file_handler)
+
+log.setLevel(logging.WARN)
+log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
+
 class FinTextDataset(Dataset):
     def __init__(self, df, **config):
         super(FinTextDataset, self).__init__()
-        # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        device = torch.device("cpu")
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        #device = torch.device("cpu")
 
         default_config = {
-            "community_row_len": 1000,
-            "decomposition_method": "SVD",
+            "community_row_len": 5000,
+            "decomposition_method": "Dull",
             "bundle_size": 15,
         }
 
@@ -42,45 +55,60 @@ class FinTextDataset(Dataset):
             if tensor.shape[0] == row_len:
                 return tensor
             elif tensor.shape[0] < row_len:
-                increased_tensor = torch.zeros((row_len, tensor.shape[1]))
-                increased_tensor[: tensor.shape[0], :] = tensor
+                increased_tensor = torch.zeros(row_len, tensor.shape[1]).to(device)
+                increased_tensor[:tensor.shape[0], :] = tensor
+
                 return increased_tensor
             else:
                 method = self.config["decomposition_method"]
+                tensor = tensor.t()
                 if method == "SVD":
-                    U, S, V = torch.svd(tensor)
-
-                    reduced_S = S[:row_len]
-                    reduced_U = U[:, :row_len]
-                    reduced_V = V[:row_len, :]
-                    reduced_tensor = torch.mm(
-                        reduced_U, torch.mm(torch.diag(reduced_S), reduced_V.t())
-                    )
+                    U, S, V = torch.pca_lowrank(tensor, q=row_len)
+                    print(V.shape)
+                    #reduced_S = S[:row_len]
+                    #reduced_U = U[:, :row_len]
+                    #reduced_V = V[:row_len, :]
+                    reduced_tensor = torch.mm(tensor, V[:, :row_len])
                 elif method == "PCA":
-                    vectors_np = tensor.numpy()
+                    vectors_np = tensor.cpu().numpy()
 
                     pca = PCA(n_components=row_len)
                     reduced_tensor = pca.fit_transform(vectors_np)
                     reduced_tensor = torch.from_numpy(reduced_tensor)
                 elif method == "NMF":
-                    vectors_np = tensor.numpy()
+                    vectors_np = tensor.cpu().numpy()
 
                     nmf = NMF(n_components=row_len)
                     reduced_tensor = nmf.fit_transform(vectors_np)
                     reduced_tensor = torch.from_numpy(reduced_tensor)
+                elif method == 'Dull':
+                    reduced_tensor = tensor[:, :row_len]
                 else:
                     raise RuntimeError
+
+                reduced_tensor = reduced_tensor.t()
 
                 return reduced_tensor
 
         def embed_text(text_lt, tokenizer, model):
             article_tensor_lt = []
             for text in text_lt:
-                base_vector = (
-                    torch.tensor(tokenizer.encode(text)).unsqueeze(0).to(device)
-                )
-                embedded_matrix = torch.tensor(model(base_vector)[0][0]).to(device)
-                article_tensor_lt.append(embedded_matrix)
+                if type(text) == str:
+                    base_vector = (
+                        tokenizer.encode(
+                            text,
+                            return_tensors='pt',
+                            max_length=512,
+                            truncation=True
+                        ).to(device)
+                    )
+                    try:
+                        embedded_matrix = model(base_vector)
+                    except RuntimeError:
+                        log.warning(f'discarded: {text}')
+                        continue
+                    embedded_matrix = torch.tensor(embedded_matrix[0][0]).to(device)
+                    article_tensor_lt.append(embedded_matrix)
 
             return torch.cat(article_tensor_lt, dim=0)
 
@@ -103,11 +131,16 @@ class FinTextDataset(Dataset):
             community_tensor = embed_text(
                 period["CommunityText"], kc_tokenizer, kc_model
             )
-            community_tensor = dim_fix(
+            non_singular_community = dim_fix(
                 community_tensor, self.config["community_row_len"]
             )
+            community_tensor = torch.zeros(2200, self.config["community_row_len"], 768)
+            community_tensor[:non_singular_community.shape[0], :, :] = non_singular_community
 
-            community_metric_index = torch.tensor(period["MetricIndex"])
+            non_singular_metric = torch.tensor(period["MetricIndex"])
+            community_metric_index = torch.zeros(2200)
+            community_metric_index[:non_singular_metric.shape[0]] = non_singular_metric
+            print(community_metric_index.shape)
 
             price_index = torch.tensor(
                 [period["Open"], period["High"], period["Low"], period["Close"]]
@@ -126,6 +159,7 @@ class FinTextDataset(Dataset):
 
         feature_dict = dict()
         for name, total_row in row_dict.items():
+            print(name)
             feature_dict[name] = make_chunk_and_stack(total_row)
         self.feature_df = pd.DataFrame(feature_dict)
         self.target_tensor = torch.tensor(
