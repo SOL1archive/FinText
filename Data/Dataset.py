@@ -109,6 +109,7 @@ class FinTextDataset(Dataset):
             total_tensor = torch.cat(article_tensor_lt, dim=0)
             for tensor in article_tensor_lt:
                 del tensor
+            torch.cuda.empty_cache()
 
             return total_tensor
 
@@ -151,7 +152,6 @@ class FinTextDataset(Dataset):
         del kc_tokenizer
         del kc_model
         torch.cuda.empty_cache()
-        
 
         def make_chunk_and_stack(data_lt):
             def divide_chunks(lt, n):     
