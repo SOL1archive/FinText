@@ -1,6 +1,4 @@
-import logging
 import os
-import sys
 
 import pandas as pd
 
@@ -12,24 +10,8 @@ from torch.utils.data import Dataset
 
 from transformers import ElectraTokenizer, ElectraModel
 
-import torch
-import pandas as pd
-
-def divide_chunks(lt, n):
-     
-    for i in range(0, len(lt), n):
-        yield lt[i:i + n]
-
 def to(tensor, device):
     tensor.to(device)
-
-log = logging.getLogger(__name__)
-stream_hander = logging.StreamHandler()
-log.addHandler(stream_hander)
-
-log.setLevel(logging.WARN)
-log.setLevel(logging.INFO)
-log.setLevel(logging.DEBUG)
 
 class FinTextDataset(Dataset):
     def __init__(self, df, **config):
@@ -118,7 +100,6 @@ class FinTextDataset(Dataset):
                     try:
                         embedded_matrix = model(base_vector)
                     except RuntimeError:
-                        log.warning(f'discarded: {text}')
                         continue
                     embedded_matrix = torch.tensor(embedded_matrix[0][0]).to(device)
                     article_tensor_lt.append(embedded_matrix)
@@ -173,6 +154,10 @@ class FinTextDataset(Dataset):
         
 
         def make_chunk_and_stack(data_lt):
+            def divide_chunks(lt, n):     
+                for i in range(0, len(lt), n):
+                    yield lt[i:i + n]
+            
             row_lt = []
             for row in divide_chunks(data_lt, self.config["bundle_size"]):
                 row_lt.append(torch.stack(row))
