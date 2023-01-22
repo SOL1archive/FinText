@@ -213,8 +213,8 @@ class FinTextDataset(Dataset):
         self.feature_df.to_pickle('feature.pkl')
         torch.save(self.target_tensor, 'target.pt')
         os.chdir('..')
-        os.system(f'tar {path}.tar ./dataset_')
-        os.system(f'gzip {path}.tar')
+        os.system(f'tar -zcvf {path}.tar.gz ./dataset_')
+        os.system(f'rm -rf ./dataset_')
 
     def __len__(self):
         return len(self.feature_df)
