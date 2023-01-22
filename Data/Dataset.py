@@ -12,14 +12,20 @@ from torch.utils.data import Dataset
 
 from transformers import ElectraTokenizer, ElectraModel
 
-from utils import *
+import torch
+import pandas as pd
+
+def divide_chunks(lt, n):
+     
+    for i in range(0, len(lt), n):
+        yield lt[i:i + n]
+
+def to(tensor, device):
+    tensor.to(device)
 
 log = logging.getLogger(__name__)
 stream_hander = logging.StreamHandler()
 log.addHandler(stream_hander)
-
-file_handler = logging.FileHandler('/home/thesol1/projects/FinText/log/dataset.log')
-log.addHandler(file_handler)
 
 log.setLevel(logging.WARN)
 log.setLevel(logging.INFO)
