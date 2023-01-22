@@ -1,4 +1,6 @@
 import logging
+import os
+import sys
 
 import pandas as pd
 
@@ -50,6 +52,11 @@ class FinTextDataset(Dataset):
 
         if df is None:
             raise RuntimeError
+        elif type(df) == str:
+            os.system(f'gzip -d {df}')
+            os.chdir('./dataset_')
+            self.feature_df = pd.read_pickle('./feature.pkl')
+            self.target_tensor = torch.load('target.pt')
 
         def dim_fix(tensor, row_len):
             if tensor.shape[0] == row_len:
@@ -107,7 +114,7 @@ class FinTextDataset(Dataset):
                     except RuntimeError:
                         log.warning(f'discarded: {text}')
                         continue
-                    embedded_matrix = torch.tensor(embedded_matrix[0][0], ).to(device)
+                    embedded_matrix = torch.tensor(embedded_matrix[0][0]).to(device)
                     article_tensor_lt.append(embedded_matrix)
                     
                     del base_vector
@@ -208,6 +215,15 @@ class FinTextDataset(Dataset):
         )
 
         return train_dataset, test_dataset
+
+    def save(self, path='dataset/dataset'):
+        os.mkdir('./dataset_')
+        os.chdir('./dataset_')
+        self.feature_df.to_pickle('feature.pkl')
+        torch.save(self.target_tensor, 'target.pt')
+        os.chdir('..')
+        os.system(f'tar {path}.tar ./dataset_')
+        os.system(f'gzip {path}.tar')
 
     def __len__(self):
         return len(self.feature_df)

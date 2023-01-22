@@ -31,8 +31,7 @@ class TrainTestApp:
             "lr": 0.001,
             'lr_scheduler': None,
             "df_list": [
-                pd.read_csv("./data-dir/kakao.xlsx"),
-                pd.read_csv("./data-dir/spc.xlsx"),
+                pd.read_pickle('./data-dir/data-df.pkl')
             ],
             'train_size': 0.8
         }
