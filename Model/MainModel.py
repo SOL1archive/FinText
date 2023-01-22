@@ -8,12 +8,18 @@ class FinTextModel(nn.Module):
         super(FinTextModel, self).__init__()
 
         # Neural Networks
-        self.community_cnn = CNN_Layer(
-            in_channels=1, 
-            out_channels=10, 
-            kernel_size=(3, 9, 3), 
-            stride=1, 
-            padding=(1, 4, 1)
+        self.community_cnn = nn.Sequential(
+            CNN_Layer(
+                in_channels=1, 
+                out_channels=10, 
+                kernel_size=(3, 9, 3), 
+                stride=1, 
+                padding=(1, 4, 1)
+            ),
+            CNN_Layer(
+                in_channels=10,
+                
+            )
         )
 
         self.community_metric_ffn = nn.Sequential(

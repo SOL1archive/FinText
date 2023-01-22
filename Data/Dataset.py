@@ -107,10 +107,16 @@ class FinTextDataset(Dataset):
                     except RuntimeError:
                         log.warning(f'discarded: {text}')
                         continue
-                    embedded_matrix = torch.tensor(embedded_matrix[0][0]).to(device)
+                    embedded_matrix = torch.tensor(embedded_matrix[0][0], ).to(device)
                     article_tensor_lt.append(embedded_matrix)
+                    
+                    del base_vector
 
-            return torch.cat(article_tensor_lt, dim=0)
+            total_tensor = torch.cat(article_tensor_lt, dim=0)
+            for tensor in article_tensor_lt:
+                del tensor
+
+            return total_tensor
 
         feature_df = df.drop("Label", axis=1)
 
@@ -134,13 +140,11 @@ class FinTextDataset(Dataset):
             non_singular_community = dim_fix(
                 community_tensor, self.config["community_row_len"]
             )
-            community_tensor = torch.zeros(2200, self.config["community_row_len"], 768)
-            community_tensor[:non_singular_community.shape[0], :, :] = non_singular_community
+            community_tensor = non_singular_community
 
             non_singular_metric = torch.tensor(period["MetricIndex"])
             community_metric_index = torch.zeros(2200)
             community_metric_index[:non_singular_metric.shape[0]] = non_singular_metric
-            print(community_metric_index.shape)
 
             price_index = torch.tensor(
                 [period["Open"], period["High"], period["Low"], period["Close"]]
@@ -149,6 +153,11 @@ class FinTextDataset(Dataset):
             row_dict["community_tensor"].append(community_tensor)
             row_dict["community_metric_index"].append(community_metric_index)
             row_dict["price_index"].append(price_index)
+        
+        del kc_tokenizer
+        del kc_model
+        torch.cuda.empty_cache()
+        
 
         def make_chunk_and_stack(data_lt):
             row_lt = []
@@ -160,7 +169,10 @@ class FinTextDataset(Dataset):
         feature_dict = dict()
         for name, total_row in row_dict.items():
             print(name)
+            for i, row in enumerate(total_row):
+                total_row[i] = row.to('cpu')
             feature_dict[name] = make_chunk_and_stack(total_row)
+            
         self.feature_df = pd.DataFrame(feature_dict)
         self.target_tensor = torch.tensor(
             pd.get_dummies(df["Label"]).values[0 : -1 : self.config["bundle_size"]]
