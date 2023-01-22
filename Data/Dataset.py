@@ -41,10 +41,9 @@ class FinTextDataset(Dataset):
         if df is None:
             raise RuntimeError
         elif type(df) == str:
-            os.system(f'gzip -d {df}')
-            os.chdir('./dataset_')
+            os.chdir(f'df')
             self.feature_df = pd.read_pickle('./feature.pkl')
-            self.target_tensor = torch.load('target.pt')
+            self.target_tensor = torch.load('./target.pt')
 
         def dim_fix(tensor, row_len):
             if tensor.shape[0] == row_len:
@@ -207,14 +206,12 @@ class FinTextDataset(Dataset):
 
         return train_dataset, test_dataset
 
-    def save(self, path='dataset/dataset'):
-        os.mkdir('./dataset_')
-        os.chdir('./dataset_')
+    def save(self, path='dataset'):
+        os.mkdir(f'{path}')
+        os.chdir(f'{path}')
         self.feature_df.to_pickle('feature.pkl')
         torch.save(self.target_tensor, 'target.pt')
         os.chdir('..')
-        os.system(f'tar -zcvf {path}.tar.gz ./dataset_')
-        os.system(f'rm -rf ./dataset_')
 
     def __len__(self):
         return len(self.feature_df)

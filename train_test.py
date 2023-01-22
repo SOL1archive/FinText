@@ -31,7 +31,7 @@ class TrainTestApp:
             "lr": 0.001,
             'lr_scheduler': None,
             "df_list": [
-                pd.read_pickle('./data-dir/data-df.pkl')
+                pd.read_pickle('./data-dir/data-df0.pkl')
             ],
             'train_size': 0.8
         }
@@ -85,9 +85,11 @@ class TrainTestApp:
             log_dir = f'./runs/{self.time_str}/'
 
             self.train_writer = SummaryWriter(
-                log_dir=log_dir + 'train_cls')
+                log_dir=log_dir + 'train_cls'
+            )
             self.test_writer = SummaryWriter(
-                log_dir=log_dir + 'test_cls')
+                log_dir=log_dir + 'test_cls'
+            )
 
     def prepare_optimizer(self):
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
