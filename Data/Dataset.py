@@ -1,7 +1,5 @@
 import os
 
-import pandas as pd
-
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA, NMF
 
@@ -16,6 +14,14 @@ LABEL_NUM = 2
 def to(tensor, device):
     tensor.to(device)
 
+def dict_index(dict, idx):
+    result = []
+    for key in dict.keys():
+        result.append(
+            dict[key][idx]
+        )
+
+    return result
 class FinTextDataset(Dataset):
     def __init__(self, df, **config):
         super(FinTextDataset, self).__init__()
@@ -34,10 +40,10 @@ class FinTextDataset(Dataset):
 
         self.config = config
 
-        if 'feature_df' in self.config.keys() and 'target_tensor' in self.config.keys():
-            self.feature_df = self.config['feature_df']
+        if 'feature_dict' in self.config.keys() and 'target_tensor' in self.config.keys():
+            self.feature_dict = self.config['feature_dict']
             self.target_tensor = self.config['target_tensor']
-            self.config.pop('feature_df')
+            self.config.pop('feature_dict')
             self.config.pop('target_tensor')
             return
 
@@ -45,7 +51,16 @@ class FinTextDataset(Dataset):
             raise RuntimeError
         elif type(df) == str:
             os.chdir(f'{df}')
-            self.feature_df = pd.read_pickle('./feature.pkl')
+            feature_lt = []
+            for file in os.listdir():
+                if 'feature_' in file and file.endswith('.pt'):
+                    feature_lt.append(
+                        file[file.find('_') + 1:file.rfind('.pt')]
+                    )
+            self.feature_dict = dict()
+            for feature in feature_lt:
+                self.feature_dict[feature] = torch.load(f'./feature_{feature}.pt')
+
             self.target_tensor = torch.load('./target.pt')
             os.chdir('../..')
             return
@@ -175,7 +190,12 @@ class FinTextDataset(Dataset):
                 total_row[i] = row.to('cpu')
             feature_dict[name] = make_chunk_and_stack(total_row)
             
-        self.feature_df = pd.DataFrame(feature_dict)
+        for feature in feature_dict:
+            feature_dict[feature] = torch.stack(
+                feature_dict[feature]
+            )
+
+        self.feature_dict = feature_dict
         
         self.target_tensor = F.one_hot(
             torch.tensor(df["Label"].values), 
@@ -184,29 +204,28 @@ class FinTextDataset(Dataset):
 
     def to(self, device):
         self.target_tensor.to(device)
-        for _, row in self.feature_df.iterrows():
-            for item in row:
-                item.to(device)
+        for feature in self.feature_dict:
+            self.feature_dict[feature].to(device)
 
     def train_test_split(self, train_size=0.80):
         train_index, test_index = train_test_split(
-            range(len(self.feature_df)), train_size=train_size
+            range(len(self.target_tensor)), train_size=train_size
         )
 
-        train_feature = self.feature_df.iloc[train_index]
+        train_feature = self.feature_dict[train_index]
         train_target = self.target_tensor[train_index]
-        test_feature = self.feature_df.iloc[test_index]
+        test_feature = self.feature_dict[test_index]
         test_target = self.target_tensor[test_index]
 
         train_dataset = FinTextDataset(
             df=None, 
-            feature_df=train_feature,
+            feature_dict=train_feature,
             target_tensor=train_target,
             **self.config
         )
         test_dataset = FinTextDataset(
             df=None,
-            feature_df=test_feature,
+            feature_dict=test_feature,
             target_tensor=test_target,
             **self.config
         )
@@ -216,27 +235,31 @@ class FinTextDataset(Dataset):
     def save(self, path='dataset'):
         os.mkdir(f'{path}')
         os.chdir(f'{path}')
-        self.feature_df.to_pickle('feature.pkl')
+        for feature in self.feature_dict.keys():
+            torch.save(self.feature_dict[feature], f'feature_{feature}.pt')
+
         torch.save(self.target_tensor, 'target.pt')
         os.chdir('..')
 
     def __len__(self):
-        return len(self.feature_df)
+        return len(self.target_tensor)
 
     def __getitem__(self, index):
-        return (self.feature_df.iloc[index], self.target_tensor[index])
+        return (
+            dict_index(self.feature_dict, index), 
+            self.target_tensor[index]
+        )
 
 def concat_dataset(dataset_lt):
     dataset = dataset_lt[0]
 
-    dataset.feature_df = pd.concat(
-        [
-            dataset.feature_df
-        ] +
-        [
-            dataset_item.feature_df for dataset_item in dataset_lt[1:4]
-        ]
-    )
+    for feature in dataset.feature_dict.keys():
+        total_feature_lt = []
+        for dataset_item in dataset_lt[:4]:
+            total_feature_lt.append(
+                dataset_item.feature_dict[feature]
+            )
+        dataset.feature_dict = torch.concat(total_feature_lt)
 
     dataset.target_tensor = torch.concat(
         [
