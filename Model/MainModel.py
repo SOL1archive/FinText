@@ -18,6 +18,10 @@ class FinTextModel(nn.Module):
             ),
             CNN_Layer(
                 in_channels=10,
+                out_channels=20,
+                kernel_size=(3,9,3),
+                stride=1,
+                padding=(1,4,1)
                 
             )
         )
