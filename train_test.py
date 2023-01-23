@@ -1,7 +1,4 @@
 import datetime
-import logging
-
-import pandas as pd
 
 import torch
 import torch.nn as nn
@@ -26,7 +23,6 @@ class TrainTestApp:
                 config[key] = default_config[key]
 
         self.config = config
-        self.df_list = self.config["df_list"]
         self.num_epoch = self.config["num_epoch"]
         self.lr = self.config['lr']
         self.train_size = self.config['train_size']
