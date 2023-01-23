@@ -63,7 +63,14 @@ class TrainTestApp:
         self.prepare_dataloader()
 
     def prepare_dataset(self):
-        self.dataset = FinTextDataset(self.df_list[0])
+        def idx2path(idx):
+            return f'execution/dataset/dataset{idx}.dataset'
+        dataset_lt = []
+        for idx in range(5):
+            dataset_lt.append(FinTextDataset(idx2path(idx)))
+        
+        self.dataset = concat_dataset(dataset_lt)
+        
         #만약 전체 데이터셋을 GPU device에 올릴 수 있는 경우 다음 주석 해제
         #self.dataset.to(self.device)
         self.train_dataset, self.test_dataset = self.dataset.train_test_split(self.train_size)

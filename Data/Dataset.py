@@ -219,18 +219,31 @@ class FinTextDataset(Dataset):
     def __getitem__(self, index):
         return (self.feature_df.iloc[index], self.target_tensor[index])
 
-def concat_dataset(df_list):
+def concat_dataset(dataset_lt):
+    dataset = dataset_lt[0]
+
+    for dataset_item in dataset_lt[1:]:
+        dataset.feature_df = pd.concat(
+            [
+                dataset.feature_df,
+                dataset_item.feature_df
+            ]
+        )
+
+        dataset.target_tensor = torch.concat(
+            [
+                dataset.target_tensor, 
+                dataset_item.target_tensor
+                ]
+        )
+
+    return dataset
+
+def concat_df_dataset(df_list):
     dataset_lt = []
     for df in df_list:
         dataset_lt.append(FinTextDataset(df))
     
-    dataset = dataset_lt[0]
-    for dataset_item in dataset_lt[1:]:
-        dataset.feature_df = pd.concat(
-            [dataset.feature_df, dataset_item.feature_df]
-        )
-        dataset.target_tensor = torch.concat(
-            [dataset.target_tensor, dataset_item.target_tensor]
-        )
+    dataset = concat_dataset(dataset_lt)
     
     return dataset
