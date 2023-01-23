@@ -229,20 +229,23 @@ class FinTextDataset(Dataset):
 def concat_dataset(dataset_lt):
     dataset = dataset_lt[0]
 
-    for dataset_item in dataset_lt[1:]:
-        dataset.feature_df = pd.concat(
-            [
-                dataset.feature_df,
-                dataset_item.feature_df
-            ]
-        )
+    dataset.feature_df = pd.concat(
+        [
+            dataset.feature_df
+        ] +
+        [
+            dataset_item.feature_df for dataset_item in dataset_lt
+        ]
+    )
 
-        dataset.target_tensor = torch.concat(
-            [
-                dataset.target_tensor, 
-                dataset_item.target_tensor
-                ]
-        )
+    dataset.target_tensor = torch.concat(
+        [
+            dataset.target_tensor, 
+        ] +
+        [
+            dataset_item.target_tensor for dataset_item in dataset_lt
+        ]
+    )
 
     return dataset
 
