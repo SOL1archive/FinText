@@ -44,7 +44,7 @@ class FinTextDataset(Dataset):
             os.chdir(f'{df}')
             self.feature_df = pd.read_pickle('./feature.pkl')
             self.target_tensor = torch.load('./target.pt')
-            os.chdir('..')
+            os.chdir('../..')
             return
 
         def dim_fix(tensor, row_len):
