@@ -178,7 +178,7 @@ class FinTextDataset(Dataset):
         self.feature_df = pd.DataFrame(feature_dict)
         
         self.target_tensor = F.one_hot(
-            df["Label"], 
+            torch.tensor(df["Label"].values), 
             num_classes=LABEL_NUM
         )[0 : -1 : self.config["bundle_size"]]
 
