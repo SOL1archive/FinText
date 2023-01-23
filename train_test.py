@@ -45,7 +45,7 @@ class TrainTestApp:
 
     def prepare_dataset(self):
         def idx2path(idx):
-            return f'dataset/dataset{idx}.dataset'
+            return f'./dataset/dataset{idx}.dataset'
         dataset_lt = []
         for idx in range(5):
             dataset_lt.append(FinTextDataset(idx2path(idx)))
