@@ -3,6 +3,7 @@ import datetime
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from Data.Dataset import FinTextDataset, concat_dataset
@@ -57,8 +58,8 @@ class TrainTestApp:
         self.train_dataset, self.test_dataset = self.dataset.train_test_split(self.train_size)
 
     def prepare_dataloader(self):
-        self.train_dataloader = FinTextDataLoader(self.train_dataset)
-        self.test_dataloader = FinTextDataLoader(self.test_dataset)
+        self.train_dataloader = DataLoader(self.train_dataset, batch_size=14)
+        self.test_dataloader = DataLoader(self.test_dataset, batch_size=15)
 
     def prepare_model(self):
         self.model = FinTextModel()
