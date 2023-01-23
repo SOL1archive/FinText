@@ -6,9 +6,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA, NMF
 
 import torch
+import torch.nn.functional as F
 from torch.utils.data import Dataset
 
 from transformers import ElectraTokenizer, ElectraModel
+
+LABEL_NUM = 2
 
 def to(tensor, device):
     tensor.to(device)
@@ -22,7 +25,7 @@ class FinTextDataset(Dataset):
         default_config = {
             "community_row_len": 5000,
             "decomposition_method": "Dull",
-            "bundle_size": 15,
+            "bundle_size": 14,
         }
 
         for key in default_config.keys():
@@ -173,9 +176,11 @@ class FinTextDataset(Dataset):
             feature_dict[name] = make_chunk_and_stack(total_row)
             
         self.feature_df = pd.DataFrame(feature_dict)
-        self.target_tensor = torch.tensor(
-            pd.get_dummies(df["Label"]).values[0 : -1 : self.config["bundle_size"]]
-        )
+        
+        self.target_tensor = F.one_hot(
+            df["Label"], 
+            num_classes=LABEL_NUM
+        )[0 : -1 : self.config["bundle_size"]]
 
     def to(self, device):
         self.target_tensor.to(device)
