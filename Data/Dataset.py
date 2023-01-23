@@ -41,7 +41,7 @@ class FinTextDataset(Dataset):
         if df is None:
             raise RuntimeError
         elif type(df) == str:
-            os.chdir(f'df')
+            os.chdir(f'{df}')
             self.feature_df = pd.read_pickle('./feature.pkl')
             self.target_tensor = torch.load('./target.pt')
 
