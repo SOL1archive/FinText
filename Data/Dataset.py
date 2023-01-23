@@ -234,7 +234,7 @@ def concat_dataset(dataset_lt):
             dataset.feature_df
         ] +
         [
-            dataset_item.feature_df for dataset_item in dataset_lt
+            dataset_item.feature_df for dataset_item in dataset_lt[1:4]
         ]
     )
 
@@ -243,7 +243,7 @@ def concat_dataset(dataset_lt):
             dataset.target_tensor, 
         ] +
         [
-            dataset_item.target_tensor for dataset_item in dataset_lt
+            dataset_item.target_tensor for dataset_item in dataset_lt[1:4]
         ]
     )
 
