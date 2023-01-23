@@ -12,27 +12,12 @@ from Data.Dataset import FinTextDataset, concat_dataset
 from Data.DataLoader import FinTextDataLoader
 from Model.MainModel import FinTextModel
 
-log = logging.getLogger(__name__)
-stream_hander = logging.StreamHandler()
-log.addHandler(stream_hander)
-
-log_dir = __file__[:__file__.rfind('/')]
-file_handler = logging.FileHandler(log_dir + '/log/train-test.log')
-log.addHandler(file_handler)
-
-# log.setLevel(logging.WARN)
-log.setLevel(logging.INFO)
-log.setLevel(logging.DEBUG)
-
 class TrainTestApp:
     def __init__(self, **config):
         default_config = {
             "num_epoch": 30,
             "lr": 0.001,
             'lr_scheduler': None,
-            "df_list": [
-                pd.read_pickle('./data-dir/data-df0.pkl')
-            ],
             'train_size': 0.8
         }
 
@@ -82,7 +67,6 @@ class TrainTestApp:
     def prepare_model(self):
         self.model = FinTextModel()
         if self.use_cuda:
-            log.info(f"Using CUDA: {torch.cuda.device_count()} devices.")
             if torch.cuda.device_count() > 1:
                 self.model = nn.DataParallel(self.model)
             self.model = self.model.to(self.device)
@@ -108,7 +92,6 @@ class TrainTestApp:
         )
 
     def train(self):
-        log.info(f'Start Training: {self.time_str}')
         criterion = nn.CrossEntropyLoss().to(self.device)
 
         for epoch in range(self.num_epoch):
@@ -129,7 +112,6 @@ class TrainTestApp:
             self.scheduler.step()
 
             msg = f"EPOCH: {epoch}, Training Loss {loss.item():.5f}"
-            log.info(msg)
             if epoch % 10 == 0:
                 print(msg)
 
@@ -157,7 +139,6 @@ class TrainTestApp:
                 self.test_writer.add_scalar('accuracy', accuracy, epoch)
                 self.test_writer.add_scalar('precision', precision, epoch)
 
-        log.info(f'End Training {datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")}')
         self.train_writer.flush()
         self.test_writer.flush()
 
