@@ -52,20 +52,14 @@ class TrainTestApp:
         for idx in range(5):
             dataset_lt.append(FinTextDataset(idx2path(idx)))
         
+        for dataset in dataset_lt:
+            pprint(dataset.feature_dict)
+
         self.dataset = concat_dataset(dataset_lt)
         
         #만약 전체 데이터셋을 GPU device에 올릴 수 있는 경우 다음 주석 해제
         #self.dataset.to(self.device)
         self.train_dataset, self.test_dataset = self.dataset.train_test_split(self.train_size)
-
-        print('train feature\n')
-        pprint(self.train_dataset.feature_dict)
-        print('train target\n')
-        pprint(self.train_dataset.target_tensor)
-        print('test feature\n')
-        pprint(self.test_dataset.feature_dict)
-        print('test target\n')
-        pprint(self.test_dataset.target_tensor)
 
     def prepare_dataloader(self):
         self.train_dataloader = DataLoader(self.train_dataset, batch_size=14)
