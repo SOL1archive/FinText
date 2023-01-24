@@ -12,9 +12,9 @@ from transformers import ElectraTokenizer, ElectraModel
 
 LABEL_NUM = 2
 
-def to(tensor_lt, device):
-    for i, tensor in enumerate(tensor_lt):
-        tensor_lt[i] = tensor.to(device)
+def to(tensor_dict, device):
+    for feature in tensor_dict.keys():
+        tensor_dict[feature] = tensor_dict[feature].to(device)
     
     return tensor_lt
 
@@ -262,10 +262,8 @@ def concat_dataset(dataset_lt):
     dataset = dataset_lt[0]
 
     for feature in dataset.feature_dict.keys():
-        print(feature)
         total_feature_lt = []
         for dataset_item in dataset_lt[:4]:
-            print(type(dataset_item.feature_dict))
             total_feature_lt.append(
                 dataset_item.feature_dict[feature]
             )
