@@ -58,10 +58,14 @@ class TrainTestApp:
         #self.dataset.to(self.device)
         self.train_dataset, self.test_dataset = self.dataset.train_test_split(self.train_size)
 
-        pprint('train feature\n', self.train_dataset.feature_dict)
-        pprint('train target\n', self.train_dataset.target_tensor)
-        pprint('test feature\n', self.test_dataset.feature_dict)
-        pprint('test target\n', self.test_dataset.target_tensor)
+        print('train feature\n')
+        pprint(self.train_dataset.feature_dict)
+        print('train target\n')
+        pprint(self.train_dataset.target_tensor)
+        print('test feature\n')
+        pprint(self.test_dataset.feature_dict)
+        print('test target\n')
+        pprint(self.test_dataset.target_tensor)
 
     def prepare_dataloader(self):
         self.train_dataloader = DataLoader(self.train_dataset, batch_size=14)
