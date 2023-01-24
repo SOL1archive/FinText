@@ -220,7 +220,6 @@ class FinTextDataset(Dataset):
             train_feature_dict[feature] = self.feature_dict[feature][train_index]
         train_target = self.target_tensor[train_index]
         
-        
         test_feature_dict = dict()
         for feature in self.feature_dict.keys():
             test_feature_dict[feature] = self.feature_dict[feature][test_index]
@@ -266,6 +265,7 @@ def concat_dataset(dataset_lt):
         print(feature)
         total_feature_lt = []
         for dataset_item in dataset_lt[:4]:
+            print(type(dataset_item.feature_dict))
             total_feature_lt.append(
                 dataset_item.feature_dict[feature]
             )
