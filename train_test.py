@@ -51,9 +51,6 @@ class TrainTestApp:
         dataset_lt = []
         for idx in range(5):
             dataset_lt.append(FinTextDataset(idx2path(idx)))
-        
-        for dataset in dataset_lt:
-            pprint(dataset.feature_dict)
 
         self.dataset = concat_dataset(dataset_lt)
         
