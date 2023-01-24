@@ -11,8 +11,11 @@ from transformers import ElectraTokenizer, ElectraModel
 
 LABEL_NUM = 2
 
-def to(tensor, device):
-    tensor.to(device)
+def to(tensor_lt, device):
+    for i, tensor in enumerate(tensor_lt):
+        tensor_lt[i] = tensor.to(device)
+    
+    return tensor_lt
 
 def dict_index(dict, idx):
     result = []

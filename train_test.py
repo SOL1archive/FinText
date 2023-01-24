@@ -6,7 +6,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-from Data.Dataset import FinTextDataset, concat_dataset
+from Data.Dataset import FinTextDataset, concat_dataset, to
 from Data.DataLoader import FinTextDataLoader
 from Model.MainModel import FinTextModel
 
@@ -92,10 +92,10 @@ class TrainTestApp:
         criterion = nn.CrossEntropyLoss().to(self.device)
 
         for epoch in range(self.num_epoch):
-            for i, (input_tensor, labels) in enumerate(self.train_dataloader):
+            for i, (inputs, labels) in enumerate(self.train_dataloader):
                 self.model.train()
                 # Forward
-                input_tensor = input_tensor.to(self.device)
+                inputs = to(inputs, self.device)
                 output_tensor = self.model(input_tensor)
 
                 loss = criterion(output_tensor, labels)
