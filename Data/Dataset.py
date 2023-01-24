@@ -269,7 +269,7 @@ def concat_dataset(dataset_lt):
             total_feature_lt.append(
                 dataset_item.feature_dict[feature]
             )
-        dataset.feature_dict = torch.concat(total_feature_lt)
+        dataset.feature_dict[feature] = torch.concat(total_feature_lt)
 
     dataset.target_tensor = torch.concat(
         [
