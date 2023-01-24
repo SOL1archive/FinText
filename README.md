@@ -15,6 +15,12 @@
 ![](./docs/NLP%20Architecture.png)
 
 ## Requirments
+## Hardward Requirments
+CPU: 8 Core or more
+RAM: 24GB
+GPU: NVidia GPU with 16GB or more
+
+## Libraries or Frameworks
 |Libraries or Frameworks|Version|
 |-|-|
 |numpy|1.23.5|
