@@ -96,7 +96,7 @@ class TrainTestApp:
                 self.model.train()
                 # Forward
                 inputs = to(inputs, self.device)
-                output_tensor = self.model(input_tensor)
+                output_tensor = self.model(inputs)
 
                 loss = criterion(output_tensor, labels)
                 self.train_writer.add_scalar("Loss/train", loss.item(), epoch)
@@ -119,8 +119,9 @@ class TrainTestApp:
                 total_cnt = 0.
                 positive_cnt = 0.
                 accurate_pred = 0.
-                for i, (input_tensor, labels) in enumerate(self.test_dataloader):
-                    outputs = self.model(input_tensor)
+                for i, (inputs, labels) in enumerate(self.test_dataloader):
+                    inputs = to(inputs, self.device)
+                    outputs = self.model(inputs)
                     test_loss = self.loss(outputs, labels)
                     total_test_loss += test_loss.item()
                     

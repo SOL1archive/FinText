@@ -18,11 +18,9 @@ def to(tensor_lt, device):
     return tensor_lt
 
 def dict_index(dict, idx):
-    result = []
+    result = dict()
     for key in dict.keys():
-        result.append(
-            dict[key][idx]
-        )
+        result[key] = dict[key][idx]
 
     return result
 class FinTextDataset(Dataset):
