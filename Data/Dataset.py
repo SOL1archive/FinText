@@ -1,4 +1,5 @@
 import os
+from pprint import pprint
 
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA, NMF
@@ -23,6 +24,7 @@ def dict_index(input_dict, idx):
         result[key] = input_dict[key][idx]
 
     return result
+
 class FinTextDataset(Dataset):
     def __init__(self, df, **config):
         super(FinTextDataset, self).__init__()
@@ -52,9 +54,10 @@ class FinTextDataset(Dataset):
             raise RuntimeError
         elif type(df) == str:
             os.chdir(f'{df}')
+            pprint(os.listdir())
             feature_lt = []
             for file in os.listdir():
-                if 'feature_' in file and file.endswith('.pt'):
+                if file.startswith('feature_') and file.endswith('.pt'):
                     feature_lt.append(
                         file[file.find('_') + 1:file.rfind('.pt')]
                     )
@@ -111,7 +114,7 @@ class FinTextDataset(Dataset):
                 if type(text) == str:
                     base_vector = (
                         tokenizer.encode(
-                            text,
+                            text, 
                             return_tensors='pt',
                             max_length=512,
                             truncation=True
