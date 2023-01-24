@@ -54,7 +54,6 @@ class FinTextDataset(Dataset):
             raise RuntimeError
         elif type(df) == str:
             os.chdir(f'{df}')
-            pprint(os.listdir())
             feature_lt = []
             for file in os.listdir():
                 if file.startswith('feature_') and file.endswith('.pt'):
@@ -264,6 +263,7 @@ def concat_dataset(dataset_lt):
     dataset = dataset_lt[0]
 
     for feature in dataset.feature_dict.keys():
+        print(feature)
         total_feature_lt = []
         for dataset_item in dataset_lt[:4]:
             total_feature_lt.append(
