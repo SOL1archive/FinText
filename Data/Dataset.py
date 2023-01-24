@@ -66,8 +66,7 @@ class FinTextDataset(Dataset):
                 self.feature_dict[feature] = torch.load(f'./feature_{feature}.pt')
 
             self.target_tensor = torch.load('./target.pt')
-            os.system('cd -')
-            print(os.getcwd())
+            os.chdir('../../..')
             return
 
         def dim_fix(tensor, row_len):
