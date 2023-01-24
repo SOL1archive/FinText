@@ -16,7 +16,7 @@ def to(tensor_dict, device):
     for feature in tensor_dict.keys():
         tensor_dict[feature] = tensor_dict[feature].to(device)
     
-    return tensor_lt
+    return tensor_dict
 
 def dict_index(input_dict, idx):
     result = dict()
