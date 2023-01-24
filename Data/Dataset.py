@@ -17,10 +17,10 @@ def to(tensor_lt, device):
     
     return tensor_lt
 
-def dict_index(dict, idx):
+def dict_index(input_dict, idx):
     result = dict()
-    for key in dict.keys():
-        result[key] = dict[key][idx]
+    for key in input_dict.keys():
+        result[key] = input_dict[key][idx]
 
     return result
 class FinTextDataset(Dataset):
