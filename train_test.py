@@ -1,4 +1,5 @@
 import datetime
+import os
 from pprint import pprint
 
 import torch
@@ -23,6 +24,8 @@ class TrainTestApp:
         for key in default_config.keys():
             if key not in config.keys():
                 config[key] = default_config[key]
+
+        os.environ["PYTORCH_CUDA_ALLOC_CONF"] = 'max_split_size_mb:128'
 
         self.config = config
         self.num_epoch = self.config["num_epoch"]
