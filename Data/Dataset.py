@@ -212,20 +212,26 @@ class FinTextDataset(Dataset):
             range(len(self.target_tensor)), train_size=train_size
         )
 
-        train_feature = self.feature_dict[train_index]
+        train_feature_dict = dict()
+        for feature in self.feature_dict.keys():
+            train_feature_dict[feature] = self.feature_dict[feature][train_index]
         train_target = self.target_tensor[train_index]
-        test_feature = self.feature_dict[test_index]
+        
+        
+        test_feature_dict = dict()
+        for feature in self.feature_dict.keys():
+            test_feature_dict[feature] = self.feature_dict[feature][test_index]
         test_target = self.target_tensor[test_index]
 
         train_dataset = FinTextDataset(
             df=None, 
-            feature_dict=train_feature,
+            feature_dict=train_feature_dict,
             target_tensor=train_target,
             **self.config
         )
         test_dataset = FinTextDataset(
             df=None,
-            feature_dict=test_feature,
+            feature_dict=test_feature_dict,
             target_tensor=test_target,
             **self.config
         )
