@@ -1,4 +1,5 @@
 import datetime
+from pprint import pprint
 
 import torch
 import torch.nn as nn
@@ -56,6 +57,11 @@ class TrainTestApp:
         #만약 전체 데이터셋을 GPU device에 올릴 수 있는 경우 다음 주석 해제
         #self.dataset.to(self.device)
         self.train_dataset, self.test_dataset = self.dataset.train_test_split(self.train_size)
+
+        pprint('train feature\n', self.train_dataset.feature_dict)
+        pprint('train target\n', self.train_dataset.target_tensor)
+        pprint('test feature\n', self.test_dataset.feature_dict)
+        pprint('test target\n', self.test_dataset.target_tensor)
 
     def prepare_dataloader(self):
         self.train_dataloader = DataLoader(self.train_dataset, batch_size=14)
