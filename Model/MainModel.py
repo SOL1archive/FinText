@@ -60,6 +60,7 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
+        print(x)
         community_tensor = x['community_tensor']
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
