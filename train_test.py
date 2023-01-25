@@ -52,7 +52,7 @@ class TrainTestApp:
         def idx2path(idx):
             return f'./execution/dataset/dataset{idx}.dataset'
         dataset_lt = []
-        for idx in range(5):
+        for idx in range(3):
             dataset_lt.append(FinTextDataset(idx2path(idx)))
 
         self.dataset = concat_dataset(dataset_lt)
@@ -63,8 +63,8 @@ class TrainTestApp:
         torch.cuda.empty_cache()
 
     def prepare_dataloader(self):
-        self.train_dataloader = DataLoader(self.train_dataset, batch_size=14)
-        self.test_dataloader = DataLoader(self.test_dataset, batch_size=15)
+        self.train_dataloader = DataLoader(self.train_dataset, batch_size=1)
+        self.test_dataloader = DataLoader(self.test_dataset, batch_size=1)
 
     def prepare_model(self):
         self.model = FinTextModel()

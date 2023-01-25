@@ -10,8 +10,8 @@ class FinTextModel(nn.Module):
         # Neural Networks
         self.community_cnn = nn.Sequential(
             StdCNN3d(
-                in_channels=6, 
-                out_channels=60, 
+                in_channels=1, 
+                out_channels=10, 
                 kernel_size=(3, 9, 3), 
                 stride=1, 
                 padding=(1, 4, 1)

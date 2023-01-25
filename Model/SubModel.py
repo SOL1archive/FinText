@@ -25,7 +25,7 @@ class StdCNN3d(nn.Module):
             stride=stride, 
             padding=padding
             )
-        self.batch_norm = nn.BatchNorm3d(num_features=out_channels)
+        self.batch_norm = nn.BatchNorm2d(num_features=out_channels)
         self.relu = nn.ReLU()
         self.max_pool = nn.MaxPool3d(kernel_size=kernel_size)
 
