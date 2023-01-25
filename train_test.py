@@ -113,6 +113,7 @@ class TrainTestApp:
                 
                 # Memory Detach
                 loss.detach()
+                del loss
                 del inputs
                 del outputs
                 torch.cuda.empty_cache()
