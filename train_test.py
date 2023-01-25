@@ -98,7 +98,6 @@ class TrainTestApp:
 
         for epoch in range(self.num_epoch):
             for i, (inputs, labels) in enumerate(self.train_dataloader):
-                torch.cuda.empty_cache()
                 self.model.train()
                 # Forward
                 inputs = to(inputs, self.device)
@@ -111,6 +110,7 @@ class TrainTestApp:
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+                loss.detach()
 
             self.scheduler.step()
 
