@@ -43,6 +43,8 @@ class FinTextModel(nn.Module):
             output_size=4, 
             num_layers=5
         )
+
+        self.flatten = nn.Flatten()
             
         self.total_ffn = nn.Sequential(
             nn.Linear(in_features=10000, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
@@ -66,10 +68,13 @@ class FinTextModel(nn.Module):
 
         # In Neural Network
         community_tensor = self.community_cnn(community_tensor)
+        community_tensor = self.flatten(community_tensor)
 
         community_metric_index = self.community_metric_ffn(community_metric_index)
+        community_metric_index = self.flatten(community_metric_index)
 
         price_index = self.gru(price_index)
+        price_index = self.flatten(price_index)
 
         r'''
         output tensor dimension 계산공식:
@@ -81,7 +86,7 @@ class FinTextModel(nn.Module):
 
         total_out = torch.cat(
             [
-                nn.Flatten(community_tensor),
+                community_tensor,
                 community_metric_index,
                 price_index
             ], dim=0
