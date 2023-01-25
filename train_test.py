@@ -101,9 +101,9 @@ class TrainTestApp:
                 self.model.train()
                 # Forward
                 inputs = to(inputs, self.device)
-                output_tensor = self.model(inputs)
+                outputs = self.model(inputs)
 
-                loss = criterion(output_tensor, labels)
+                loss = criterion(outputs, labels)
                 self.train_writer.add_scalar("Loss/train", loss.item(), epoch)
 
                 # Backward
@@ -114,7 +114,7 @@ class TrainTestApp:
                 # Memory Detach
                 loss.detach()
                 del inputs
-                del output_tensor
+                del outputs
                 torch.cuda.empty_cache()
 
             self.scheduler.step()
@@ -147,6 +147,11 @@ class TrainTestApp:
                 precision = 100 * accurate_pred / positive_cnt
                 self.test_writer.add_scalar('accuracy', accuracy, epoch)
                 self.test_writer.add_scalar('precision', precision, epoch)
+                
+                loss.detach()
+                del inputs
+                del outputs
+                torch.cuda.empty_cache()
 
         self.train_writer.flush()
         self.test_writer.flush()
