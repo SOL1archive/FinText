@@ -69,12 +69,15 @@ class FinTextModel(nn.Module):
         # In Neural Network
         community_tensor = self.community_cnn(community_tensor)
         community_tensor = self.flatten(community_tensor)
+        community_tensor = community_tensor.view(-1, 1)
 
         community_metric_index = self.community_metric_ffn(community_metric_index)
         community_metric_index = self.flatten(community_metric_index)
+        community_metric_index = community_metric_index.view(-1, 1)
 
         price_index = self.gru(price_index)
         price_index = self.flatten(price_index)
+        price_index = price_index.view(-1, 1)
 
         r'''
         output tensor dimension 계산공식:
