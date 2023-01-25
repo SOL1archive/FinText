@@ -148,6 +148,9 @@ class TrainTestApp:
                 self.test_writer.add_scalar('precision', precision, epoch)
                 
                 loss.detach()
+                del avg_test_loss
+                del accuracy
+                del precision
                 del inputs
                 del outputs
                 torch.cuda.empty_cache()
