@@ -27,8 +27,8 @@ class FinTextModel(nn.Module):
         )
 
         self.community_metric_ffn = nn.Sequential(
-            nn.Linear(in_features=1, out_features=1, bias=False),
-            nn.BatchNorm1d(num_features=1),
+            nn.Linear(in_features=2200, out_features=14, bias=False),
+            #nn.BatchNorm1d(num_features=1),
             nn.ReLU(),
         )
 
@@ -69,7 +69,7 @@ class FinTextModel(nn.Module):
 
         community_metric_index = self.community_metric_ffn(community_metric_index)
 
-        price_index, _ = self.gru(price_index)
+        price_index = self.gru(price_index)
 
         r'''
         output tensor dimension 계산공식:

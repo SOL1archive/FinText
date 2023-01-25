@@ -31,8 +31,8 @@ class StdCNN3d(nn.Module):
 
     def forward(self, x):
         x = self.conv3d(x)
-        if self.batch_norm:
-            x = self.batch_norm(x)
+        #if self.batch_norm:
+        #    x = self.batch_norm(x)
         x = self.relu(x)
         x = self.max_pool(x)
 
