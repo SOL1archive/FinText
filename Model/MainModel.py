@@ -93,12 +93,10 @@ class FinTextModel(nn.Module):
                 community_metric_index,
                 price_index
             ], dim=0
-        )
-        print(total_out.shape)
+        ).view(1, -1)
 
         total_out = self.total_ffn(total_out)
         
-        print(total_out.shape)
         total_out = self.softmax(total_out)
 
         return total_out
