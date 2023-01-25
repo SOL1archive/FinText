@@ -110,7 +110,12 @@ class TrainTestApp:
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+                
+                # Memory Detach
                 loss.detach()
+                del inputs
+                del output_tensor
+
 
             self.scheduler.step()
 
