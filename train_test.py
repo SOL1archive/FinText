@@ -120,8 +120,7 @@ class TrainTestApp:
             self.scheduler.step()
 
             msg = f"EPOCH: {epoch}, Training Loss {loss.item():.5f}"
-            if epoch % 10 == 0:
-                print(msg)
+            print(msg)
 
             #validation/test
             with torch.no_grad():
@@ -149,7 +148,6 @@ class TrainTestApp:
                 self.test_writer.add_scalar('precision', precision, epoch)
                 
                 loss.detach()
-                del loss
                 del inputs
                 del outputs
                 torch.cuda.empty_cache()
