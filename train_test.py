@@ -132,8 +132,8 @@ class TrainTestApp:
                 for i, (inputs, labels) in enumerate(self.test_dataloader):
                     inputs = to(inputs, self.device)
                     outputs = self.model(inputs)
-                    test_loss = self.loss(outputs, labels)
-                    total_test_loss += test_loss.item()
+                    test_loss = criterion(outputs, labels)
+                    total_test_loss += float(test_loss)
                     
                     _, pred = torch.max(outputs.data, 1)
                     total_cnt += labels.size(0)
@@ -148,9 +148,8 @@ class TrainTestApp:
                 self.test_writer.add_scalar('precision', precision, epoch)
                 
                 loss.detach()
-                del avg_test_loss
-                del accuracy
-                del precision
+                del test_loss
+                del total_test_loss
                 del inputs
                 del outputs
                 torch.cuda.empty_cache()
