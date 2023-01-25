@@ -115,7 +115,7 @@ class TrainTestApp:
                 loss.detach()
                 del inputs
                 del output_tensor
-
+                torch.cuda.empty_cache()
 
             self.scheduler.step()
 
