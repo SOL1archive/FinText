@@ -89,7 +89,7 @@ class TrainTestApp:
         self.scheduler = optim.lr_scheduler.LambdaLR(
             optimizer=self.optimizer,
             lr_lambda=self.lr_lambda,
-            last_epoch=-1,                            
+            last_epoch=-1,
             verbose=False
         )
 
@@ -149,6 +149,7 @@ class TrainTestApp:
                 self.test_writer.add_scalar('precision', precision, epoch)
                 
                 loss.detach()
+                del loss
                 del inputs
                 del outputs
                 torch.cuda.empty_cache()
