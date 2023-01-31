@@ -102,7 +102,6 @@ class TrainTestApp:
                 # Forward
                 inputs = to(inputs, self.device)
                 outputs = self.model(inputs)
-
                 loss = criterion(outputs, labels)
                 self.train_writer.add_scalar("Loss/train", loss.item(), epoch)
 

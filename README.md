@@ -2,6 +2,8 @@
 
 > Financial Text Mining Model
 
+> [보고서 링크](./docs/report.md)에 세부 사항이 기술됨.
+
 |||
 |-|-|
 |Version|0.0.2|
