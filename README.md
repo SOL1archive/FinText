@@ -2,7 +2,7 @@
 
 > Financial Text Mining Model
 
-> [보고서 링크](./docs/report.md)에 세부 사항이 기술됨.
+> [보고서 링크](./docs/report.md)에 프로젝트에 대한 설명이 있음.
 
 |||
 |-|-|
