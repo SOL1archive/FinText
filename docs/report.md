@@ -221,6 +221,7 @@ ELECTRA는 구글에서 발표한 pre-trained 트랜스포머 모델이다. 트�
 각 신경망 서브 모델의 출력은 한데로 모아진 후 Flatten하여 GRU와 FFNN(_Feed Forward Neural Network_)이 혼합된 신경망으로 보내진다. 이 신경망은 각 입력 피처를 모두 받아들여 종합적인 의사 결정을 하는 역할을 한다. 일부 데이터는 시계열 데이터이므로 순환신경망인 GRU에 대입된 후 FFNN에, CNN의 출력들은 바로 FFNN에 대입된다.  FFNN은 가장 기본적인 신경망 기본 요소이면서 이전 입력 피처를 처리하는 데 자주 사용되므로 FFNN을 선택했다. 기본적으로 적용된 FFNN은 아무런 기법이 적용되어 있지 않지만, 필요에 따라 $L_1,\ L_2$ Regularization, Dropout과 같은 Regularization 기법이나 Batch Normalization, Residual Connection과 같은 기법을 적용할 수 있도록 했다.
 
 최종적으로는 Softmax 함수에 값을 대입하여 각 가능성에 대한 확률을 산출한다. Softmax 함수는 다음과 같이 정의된다.
+
 $$
 \begin{array}{l}
 	\text{For Given Vector\ } z^{[L]} = 
@@ -239,6 +240,7 @@ $$
 		\end{bmatrix}
 \end{array}
 $$
+
 주어진 식에서 알 수 있듯이, Sotfmax 함수는 입력 피처를 확률로 변경시켜 출력한다. Softmax 함수가 적용된 Softmax 층은 이전 FFNN 층에서 분석된 데이터를 입력 피처로 받아들여 확률을 출력한다. 해당 확률만으로도 의사결정이 가능하다. 또, Softmax 층을 제거하고 새로운 신경망 모듈을 올려서 필요한 목적에 맞게 신경망을 재사용하는 전이학습을 수행할 수도 있다. 가령 Softmax 층을 제거하고 적절하게 설계된 신경망 모듈을 올려서 스스로 금융 상품 가격과 그에 대한 인식을 판단한 후 금융 상품 거래를 수행하는 트레이딩 봇을 개발할 수 있다. 그 외에도 보다 복잡한 의사결정을 수행하는 새로운 신경망 모델을 개발할 수도 있다.
 
 ### 구현
