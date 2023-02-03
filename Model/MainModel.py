@@ -12,7 +12,7 @@ class FinTextModel(nn.Module):
             StdCNN3d(
                 in_channels=1, 
                 out_channels=10, 
-                kernel_size=(3, 9, 3), 
+                kernel_size=(3, 9, 768), 
                 stride=1, 
                 padding=(1, 4, 1)
             ),
