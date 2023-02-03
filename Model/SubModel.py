@@ -12,13 +12,13 @@ class GRU(nn.Module):
         x = self.fc(x)
         return x
 
-class StdCNN3d(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, batch_norm=True):
-        super(StdCNN3d, self).__init__()
+class StdCNN2d(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, use_batch_norm=True):
+        super(StdCNN2d).__init__()
 
-        self.batch_norm = batch_norm
+        self.use_batch_norm = use_batch_norm
 
-        self.conv3d = nn.Conv3d(
+        self.conv2d = nn.Conv2d(
             in_channels=in_channels, 
             out_channels=out_channels, 
             kernel_size=kernel_size,
@@ -27,12 +27,36 @@ class StdCNN3d(nn.Module):
             )
         self.batch_norm = nn.BatchNorm2d(num_features=out_channels)
         self.relu = nn.ReLU()
+        self.max_pool = nn.MaxPool2d(kernel_size=kernel_size)
+
+    def forward(self, x):
+        x = self.conv2d(x)
+        if self.use_batch_norm:
+            x = self.batch_norm(x)
+        x = self.relu(x)
+        x = self.max_pool(x)
+
+class StdCNN3d(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, use_batch_norm=True):
+        super(StdCNN3d, self).__init__()
+
+        self.use_batch_norm = use_batch_norm
+
+        self.conv3d = nn.Conv3d(
+            in_channels=in_channels, 
+            out_channels=out_channels, 
+            kernel_size=kernel_size,
+            stride=stride, 
+            padding=padding
+            )
+        self.batch_norm = nn.BatchNorm3d(num_features=out_channels)
+        self.relu = nn.ReLU()
         self.max_pool = nn.MaxPool3d(kernel_size=kernel_size)
 
     def forward(self, x):
         x = self.conv3d(x)
-        #if self.batch_norm:
-        #    x = self.batch_norm(x)
+        if self.use_batch_norm:
+            x = self.batch_norm(x)
         x = self.relu(x)
         x = self.max_pool(x)
 
