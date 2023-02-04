@@ -9,7 +9,7 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = nn.Sequential(
-            nn.Conv2d(
+            nn.Conv3d(
                 in_channels=1, 
                 out_channels=10, 
                 kernel_size=(3, 9, 768),
@@ -18,7 +18,7 @@ class FinTextModel(nn.Module):
             ),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(3, 9)),
-            
+
             nn.Conv2d(
                 in_channels=10, 
                 out_channels=20, 
@@ -71,7 +71,9 @@ class FinTextModel(nn.Module):
         price_index = x['price_index']
 
         # In Neural Network
+        print(community_tensor.shape)
         community_tensor = self.community_cnn(community_tensor)
+        print(community_tensor.shape)
         community_tensor = self.flatten(community_tensor)
         community_tensor = community_tensor.view(-1, 1)
 
