@@ -14,7 +14,7 @@ class GRU(nn.Module):
 
 class StdCNN2d(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding, use_batch_norm=True):
-        super(self, StdCNN2d).__init__()
+        super(StdCNN2d, self).__init__()
 
         self.use_batch_norm = use_batch_norm
 
