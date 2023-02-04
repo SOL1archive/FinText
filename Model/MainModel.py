@@ -9,14 +9,14 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = nn.Sequential(
-            StdCNN2d(
+            StdCNN3d(
                 in_channels=1, 
                 out_channels=10, 
                 kernel_size=(3, 9, 768), 
                 stride=1, 
                 padding=(1, 4, 0)
             ),
-            StdCNN2d(
+            StdCNN3d(
                 in_channels=10,
                 out_channels=20,
                 kernel_size=(3,9),
