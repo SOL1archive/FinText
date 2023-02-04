@@ -9,7 +9,7 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = nn.Sequential(
-            nn.Conv3d(
+            nn.Conv2d(
                 in_channels=1, 
                 out_channels=10, 
                 kernel_size=(3, 9, 768),
@@ -67,8 +67,8 @@ class FinTextModel(nn.Module):
     def forward(self, x):
         # Slicing Tensor
         community_tensor = x['community_tensor'].squeeze()
-        community_metric_index = x['community_metric_index']
-        price_index = x['price_index']
+        community_metric_index = x['community_metric_index'].squeeze()
+        price_index = x['price_index'].squeeze()
 
         # In Neural Network
         print(community_tensor.shape)
