@@ -14,14 +14,16 @@ class FinTextModel(nn.Module):
                 out_channels=10, 
                 kernel_size=(3, 9, 768), 
                 stride=1, 
-                padding=(1, 4, 0)
+                padding=(1, 4, 0),
+                use_batch_norm=False
             ),
             StdCNN3d(
                 in_channels=10,
                 out_channels=20,
-                kernel_size=(3,9),
+                kernel_size=(3, 9, 1),
                 stride=1,
-                padding=(1,4)
+                padding=(1, 4, 0),
+                use_batch_norm=False
             )
         )
 
