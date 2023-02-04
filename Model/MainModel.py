@@ -9,22 +9,25 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = nn.Sequential(
-            StdCNN2d(
+            nn.Conv2d(
                 in_channels=1, 
                 out_channels=10, 
-                kernel_size=(3, 9, 768), 
+                kernel_size=(3, 9, 768),
                 stride=1, 
-                padding=(1, 4, 0),
-                use_batch_norm=False
+                padding=(1, 4, 0)
             ),
-            StdCNN2d(
-                in_channels=10,
-                out_channels=20,
-                kernel_size=(3, 9, 1),
-                stride=1,
-                padding=(1, 4, 0),
-                use_batch_norm=False
-            )
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(3, 9)),
+            
+            nn.Conv2d(
+                in_channels=10, 
+                out_channels=20, 
+                kernel_size=(9, 3),
+                stride=1, 
+                padding=(4, 1, 0)
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(9, 3)),
         )
 
         self.community_metric_ffn = nn.Sequential(
