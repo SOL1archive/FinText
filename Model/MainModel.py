@@ -17,7 +17,7 @@ class FinTextModel(nn.Module):
                 padding=(1, 4, 0)
             ),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(3, 9)),
+            nn.MaxPool3d(kernel_size=(3, 9, 1)),
 
             nn.Conv2d(
                 in_channels=10, 
@@ -66,12 +66,14 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        community_tensor = x['community_tensor']
+        community_tensor = x['community_tensor'].squeeze()
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
 
         # In Neural Network
         print(community_tensor.shape)
+        print(community_metric_index.shape)
+        print(price_index.shape)
         community_tensor = self.community_cnn(community_tensor)
         print(community_tensor.shape)
         community_tensor = self.flatten(community_tensor)
