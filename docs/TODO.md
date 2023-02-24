@@ -6,7 +6,7 @@
 - 펼치기 & squeeze
 
 # Model
-
+- ReLU inplace 로 바꾸기
 
 # Train
 - Skorch
