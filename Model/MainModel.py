@@ -26,19 +26,19 @@ class FinTextModel(nn.Module):
                 stride=1, 
                 padding=(4, 1, 0)
             ),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(9, 3)),
         )
 
         self.community_metric_ffn = nn.Sequential(
             nn.Linear(in_features=2200, out_features=14, bias=False),
             #nn.BatchNorm1d(num_features=1),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
         )
 
         self.community_ffn = nn.Sequential(
             nn.Linear(in_features=1, out_features=1), 
-            nn.ReLU()
+            nn.ReLU(inplace=True)
         )
 
         self.gru = GRU(
@@ -52,11 +52,11 @@ class FinTextModel(nn.Module):
             
         self.total_ffn = nn.Sequential(
             nn.Linear(in_features=103952, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             nn.Linear(in_features=10000, out_features=7000),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             nn.Linear(in_features=7000, out_features=5000),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
         )
 
         self.softmax = nn.Sequential(

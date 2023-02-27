@@ -26,7 +26,7 @@ class StdCNN2d(nn.Module):
             padding=padding
             )
         self.batch_norm = nn.BatchNorm2d(num_features=out_channels)
-        self.relu = nn.ReLU()
+        self.relu = nn.ReLU(inplace=True)
         self.max_pool = nn.MaxPool2d(kernel_size=kernel_size)
 
     def forward(self, x):
@@ -50,7 +50,7 @@ class StdCNN3d(nn.Module):
             padding=padding
             )
         self.batch_norm = nn.BatchNorm3d(num_features=out_channels)
-        self.relu = nn.ReLU()
+        self.relu = nn.ReLU(inplace=True)
         self.max_pool = nn.MaxPool3d(kernel_size=kernel_size)
 
     def forward(self, x):
@@ -61,19 +61,3 @@ class StdCNN3d(nn.Module):
         x = self.max_pool(x)
 
         return x
-
-def CNN_Layer(in_channels, out_channels, kernel_size, stride, padding):
-    net = nn.Sequential(
-        nn.Conv3d(
-            in_channels=in_channels, 
-            out_channels=out_channels, 
-            kernel_size=kernel_size,
-            stride=stride, 
-            padding=padding
-            ),
-        nn.BatchNorm3d(num_features=out_channels),
-        nn.ReLU(),
-        nn.MaxPool3d(kernel_size=kernel_size)
-    )
-
-    return net
