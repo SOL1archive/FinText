@@ -9,29 +9,29 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn = nn.Sequential(
-            nn.Conv2d(
+            nn.Conv1d(
                 in_channels=1, 
-                out_channels=10, 
-                kernel_size=(3, 9, 768),
+                out_channels=16, 
+                kernel_size=(9, 768),
                 stride=1, 
                 padding=(1, 4, 0)
             ),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             nn.MaxPool3d(kernel_size=(3, 9, 1)),
 
-            nn.Conv2d(
+            nn.Conv1d(
                 in_channels=10, 
-                out_channels=20, 
-                kernel_size=(9, 3),
+                out_channels=32, 
+                kernel_size=5,
                 stride=1, 
                 padding=(4, 1, 0)
             ),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=(9, 3)),
+            nn.MaxPool2d(kernel_size=(9, 3)), 
         )
 
         self.community_metric_ffn = nn.Sequential(
-            nn.Linear(in_features=2200, out_features=14, bias=False),
+            nn.Linear(in_features=4, out_features=14, bias=False),
             #nn.BatchNorm1d(num_features=1),
             nn.ReLU(inplace=True),
         )
@@ -45,7 +45,7 @@ class FinTextModel(nn.Module):
             input_size=4, 
             hidden_size=10, 
             output_size=4, 
-            num_layers=5
+            num_layers=3
         )
 
         self.flatten = nn.Flatten()
@@ -66,16 +66,16 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        community_tensor = x['community_tensor'].squeeze()
-        community_metric_index = x['community_metric_index'].squeeze()
-        price_index = x['price_index'].squeeze()
+        community_tensor = x['community_tensor']
+        community_metric_index = x['community_metric_index']
+        price_index = x['price_index']
 
         # In Neural Network
-        print(community_tensor.shape)
-        print(community_metric_index.shape)
-        print(price_index.shape)
+        print("community_tensor:", community_tensor.shape)
+        print("community_metric_index:", community_metric_index.shape)
+        print("price_index:", price_index.shape)
         community_tensor = self.community_cnn(community_tensor)
-        print(community_tensor.shape)
+        print("community_tensor:", community_tensor.shape)
         community_tensor = self.flatten(community_tensor)
         community_tensor = community_tensor.view(-1, 1)
 
@@ -102,7 +102,7 @@ class FinTextModel(nn.Module):
                 price_index
             ], dim=0
         ).view(1, -1)
-
+        print('total_out:', total_out.shape)
         total_out = self.total_ffn(total_out)
         
         total_out = self.softmax(total_out)
