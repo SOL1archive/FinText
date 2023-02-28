@@ -1,7 +1,16 @@
 import torch
 import torch.nn as nn
 
-from SubModel import *
+class GRU(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, num_layers):
+        super(GRU, self).__init__()
+        self.gru = nn.GRU(input_size, hidden_size, num_layers=num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size, bias=True)
+        
+    def forward(self, x):
+        x, _ = self.gru(x)
+        x = self.fc(x)
+        return x
 
 class FinTextModel(nn.Module):
     def __init__(self):
