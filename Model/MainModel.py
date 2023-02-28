@@ -22,7 +22,7 @@ class FinTextModel(nn.Module):
                 in_channels=1, 
                 out_channels=16, 
                 kernel_size=(9, 768),
-                stride=1, 
+                stride=2, 
                 padding=(4, 0)
             ),
             nn.ReLU(inplace=True),
@@ -32,9 +32,9 @@ class FinTextModel(nn.Module):
             nn.Conv1d(
                 in_channels=16, 
                 out_channels=32, 
-                kernel_size=101,
-                stride=1, 
-                padding=50
+                kernel_size=41,
+                stride=2, 
+                padding=20
             ),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=11), 
@@ -43,10 +43,10 @@ class FinTextModel(nn.Module):
         self.community_cnn3 = nn.Sequential(
             nn.Conv1d(
                 in_channels=32, 
-                out_channels=64, 
-                kernel_size=101,
-                stride=1, 
-                padding=50
+                out_channels=32, 
+                kernel_size=41,
+                stride=2, 
+                padding=20
             ),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=11), 
