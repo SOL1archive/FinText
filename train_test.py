@@ -107,7 +107,7 @@ class TrainTestApp:
                 # Forward
                 inputs = to(inputs, self.device)
                 outputs = self.model(inputs)
-                labels = torch.tensor(labels, dtype=torch.float32)
+                labels = torch.tensor(labels, dtype=torch.float32).to(self.device)
                 loss = criterion(outputs, labels)
                 self.train_writer.add_scalar("Loss/train", loss.item(), epoch)
 
