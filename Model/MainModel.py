@@ -94,6 +94,7 @@ class FinTextModel(nn.Module):
         print("community_metric_index:", community_metric_index.shape)
         print("price_index:", price_index.shape)
         community_tensor = self.community_cnn1(community_tensor)
+        community_tensor = torch.squeeze(community_tensor)
         community_tensor = self.community_cnn2(community_tensor)
         community_tensor = self.community_cnn3(community_tensor)
         print("community_tensor:", community_tensor.shape)
