@@ -44,7 +44,7 @@ class FinTextModel(nn.Module):
         )
 
         self.community_metric_ffn = nn.Sequential(
-            nn.Linear(in_features=4, out_features=14, bias=False),
+            nn.Linear(in_features=4, out_features=14, bias=True),
             #nn.BatchNorm1d(num_features=1),
             nn.ReLU(inplace=True),
         )
@@ -85,7 +85,7 @@ class FinTextModel(nn.Module):
             community_tensor_dim[1], 
             1, 
             *community_tensor_dim[2:]
-        )
+            )
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
 
@@ -101,6 +101,12 @@ class FinTextModel(nn.Module):
         community_tensor = self.flatten(community_tensor)
         community_tensor = community_tensor.view(-1, 1)
 
+        community_metric_index_dim = community_metric_index.shape
+        community_metric_index = community_metric_index.view(
+            1, 
+            community_metric_index_dim[-1], 
+            community_metric_index_dim[-2]
+            )
         community_metric_index = self.community_metric_ffn(community_metric_index)
         community_metric_index = self.flatten(community_metric_index)
         community_metric_index = community_metric_index.view(-1, 1)
