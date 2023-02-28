@@ -67,16 +67,31 @@ class FinTextModel(nn.Module):
         self.flatten = nn.Flatten()
             
         self.total_ffn = nn.Sequential(
-            nn.Linear(in_features=103952, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
+            nn.Linear(in_features=67592, out_features=50000), # 다른 층의 출력에 맞게 조정되어야 함.
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=10000, out_features=7000),
+            nn.Dropout(0.5),
+            nn.Linear(in_features=50000, out_features=30000), 
             nn.ReLU(inplace=True),
-            nn.Linear(in_features=7000, out_features=5000),
+            nn.Dropout(0.4),
+            nn.Linear(in_features=30000, out_features=10000),
             nn.ReLU(inplace=True),
+            nn.Dropout(0.4),
+            nn.Linear(in_features=10000, out_features=5000),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.3),
+            nn.Linear(in_features=5000, out_features=2500),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.2),
+            nn.Linear(in_features=2500, out_features=1000),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.2),
+            nn.Linear(in_features=1000, out_features=500), 
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.1),
         )
 
         self.softmax = nn.Sequential(
-            nn.Linear(in_features=5000, out_features=10), 
+            nn.Linear(in_features=500, out_features=3), 
             nn.Softmax(dim=2)
         )
 
@@ -96,11 +111,11 @@ class FinTextModel(nn.Module):
         print("community_tensor:", community_tensor.shape)
         print("community_metric_index:", community_metric_index.shape)
         print("price_index:", price_index.shape)
+
         community_tensor = self.community_cnn1(community_tensor)
         community_tensor = torch.squeeze(community_tensor)
         community_tensor = self.community_cnn2(community_tensor)
         community_tensor = self.community_cnn3(community_tensor)
-        print("community_tensor:", community_tensor.shape)
         community_tensor = self.flatten(community_tensor)
         community_tensor = community_tensor.view(-1, 1)
 
