@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from Model.SubModel import *
+from SubModel import *
 
 class FinTextModel(nn.Module):
     def __init__(self):
@@ -65,7 +65,7 @@ class FinTextModel(nn.Module):
         )
 
         self.flatten = nn.Flatten()
-            
+        
         self.total_ffn = nn.Sequential(
             nn.Linear(in_features=67592, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
             nn.ReLU(inplace=True),

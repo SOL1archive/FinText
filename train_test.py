@@ -1,5 +1,6 @@
 import datetime
 import os
+import gc
 from pprint import pprint
 
 import torch
@@ -106,6 +107,7 @@ class TrainTestApp:
                 # Forward
                 inputs = to(inputs, self.device)
                 outputs = self.model(inputs)
+                labels = torch.tensor(labels, dtype=torch.float32)
                 loss = criterion(outputs, labels)
                 self.train_writer.add_scalar("Loss/train", loss.item(), epoch)
 
@@ -156,6 +158,7 @@ class TrainTestApp:
                 del total_test_loss
                 del inputs
                 del outputs
+                gc.collect()
                 torch.cuda.empty_cache()
 
         self.train_writer.flush()
