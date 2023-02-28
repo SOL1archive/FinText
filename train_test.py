@@ -113,15 +113,16 @@ class TrainTestApp:
 
                 # Backward
                 self.optimizer.zero_grad()
+                del inputs
+                del outputs
+                gc.collect()
+                torch.cuda.empty_cache()
                 loss.backward()
                 self.optimizer.step()
                 
                 # Memory Detach
                 loss.detach()
                 del loss
-                del inputs
-                del outputs
-                torch.cuda.empty_cache()
 
             self.scheduler.step()
 
