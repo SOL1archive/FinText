@@ -107,11 +107,6 @@ class FinTextModel(nn.Module):
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
 
-        # In Neural Network
-        print("community_tensor:", community_tensor.shape)
-        print("community_metric_index:", community_metric_index.shape)
-        print("price_index:", price_index.shape)
-
         community_tensor = self.community_cnn1(community_tensor)
         community_tensor = torch.squeeze(community_tensor)
         community_tensor = self.community_cnn2(community_tensor)
