@@ -44,7 +44,7 @@ class TrainTestApp:
         self.totalTrainingSamples_count = 0
 
         self.time_str = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-
+        print('Preparing datasets')
         self.prepare_dataset()
         self.prepare_dataloader()
 
@@ -96,6 +96,7 @@ class TrainTestApp:
     def train(self):
         criterion = nn.CrossEntropyLoss().to(self.device)
 
+        print('Training')
         print(len(self.dataset))
         for epoch in range(self.num_epoch):
             for i, (inputs, labels) in enumerate(self.train_dataloader):
