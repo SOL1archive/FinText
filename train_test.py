@@ -173,7 +173,7 @@ class TrainTestApp:
 
     def main(self):
         self.prepare_model()
-        #self.prepare_tensorboard_writer()
+        self.prepare_tensorboard_writer()
         self.prepare_optimizer()
 
         self.train()
