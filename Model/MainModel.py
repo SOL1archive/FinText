@@ -79,7 +79,13 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        community_tensor = torch.squeeze(x['community_tensor'])
+        community_tensor = x['community_tensor']
+        community_tensor_dim = community_tensor.shape
+        community_tensor = community_tensor.view(
+            community_tensor_dim[1], 
+            1, 
+            *community_tensor_dim[2:]
+        )
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
 
