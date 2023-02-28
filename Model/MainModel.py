@@ -91,7 +91,7 @@ class FinTextModel(nn.Module):
         )
 
         self.softmax = nn.Sequential(
-            nn.Linear(in_features=500, out_features=3), 
+            nn.Linear(in_features=500, out_features=2), 
             nn.Softmax(dim=2)
         )
 
