@@ -44,7 +44,10 @@ class FinTextModel(nn.Module):
         )
 
         self.community_metric_ffn = nn.Sequential(
-            nn.Linear(in_features=4, out_features=14, bias=True),
+            nn.Linear(in_features=14, out_features=14, bias=True),
+            #nn.BatchNorm1d(num_features=1),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_features=14, out_features=14, bias=True),
             #nn.BatchNorm1d(num_features=1),
             nn.ReLU(inplace=True),
         )
