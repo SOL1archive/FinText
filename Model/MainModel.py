@@ -9,7 +9,7 @@ class FinTextModel(nn.Module):
 
         # Neural Networks
         self.community_cnn1 = nn.Sequential(
-            nn.Conv1d(
+            nn.Conv2d(
                 in_channels=1, 
                 out_channels=16, 
                 kernel_size=(9, 768),
