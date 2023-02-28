@@ -67,22 +67,13 @@ class FinTextModel(nn.Module):
         self.flatten = nn.Flatten()
             
         self.total_ffn = nn.Sequential(
-            nn.Linear(in_features=67592, out_features=50000), # 다른 층의 출력에 맞게 조정되어야 함.
+            nn.Linear(in_features=67592, out_features=10000), # 다른 층의 출력에 맞게 조정되어야 함.
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
-            nn.Linear(in_features=50000, out_features=30000), 
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Linear(in_features=30000, out_features=10000),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Linear(in_features=10000, out_features=5000),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.3),
-            nn.Linear(in_features=5000, out_features=2500),
+            nn.Linear(in_features=10000, out_features=5000), 
             nn.ReLU(inplace=True),
             nn.Dropout(0.2),
-            nn.Linear(in_features=2500, out_features=1000),
+            nn.Linear(in_features=5000, out_features=1000),
             nn.ReLU(inplace=True),
             nn.Dropout(0.2),
             nn.Linear(in_features=1000, out_features=500), 
