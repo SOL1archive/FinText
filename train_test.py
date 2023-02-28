@@ -67,6 +67,7 @@ class TrainTestApp:
         self.test_dataloader = DataLoader(self.test_dataset, batch_size=1)
 
     def prepare_model(self):
+        print('Preparing model')
         self.model = FinTextModel()
         if self.use_cuda:
             if torch.cuda.device_count() > 1:
