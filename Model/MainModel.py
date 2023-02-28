@@ -17,17 +17,26 @@ class FinTextModel(nn.Module):
                 padding=(1, 4, 0)
             ),
             nn.ReLU(inplace=True),
-            nn.MaxPool3d(kernel_size=(3, 9, 1)),
 
             nn.Conv1d(
-                in_channels=10, 
+                in_channels=16, 
                 out_channels=32, 
-                kernel_size=5,
+                kernel_size=11,
                 stride=1, 
-                padding=(4, 1, 0)
+                padding=5
             ),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=(9, 3)), 
+            nn.MaxPool1d(kernel_size=11), 
+
+            nn.Conv1d(
+                in_channels=32, 
+                out_channels=64, 
+                kernel_size=11,
+                stride=1, 
+                padding=5
+            ),
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=11), 
         )
 
         self.community_metric_ffn = nn.Sequential(
