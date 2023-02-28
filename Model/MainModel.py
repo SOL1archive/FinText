@@ -97,6 +97,7 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
+        print('aaaa')
         community_tensor = x['community_tensor']
         community_tensor_dim = community_tensor.shape
         community_tensor = community_tensor.view(
