@@ -8,7 +8,7 @@ class FinTextModel(nn.Module):
         super(FinTextModel, self).__init__()
 
         # Neural Networks
-        self.community_cnn = nn.Sequential(
+        self.community_cnn1 = nn.Sequential(
             nn.Conv1d(
                 in_channels=1, 
                 out_channels=16, 
@@ -17,7 +17,9 @@ class FinTextModel(nn.Module):
                 padding=(1, 4, 0)
             ),
             nn.ReLU(inplace=True),
+        )
 
+        self.community_cnn2 = nn.Sequential(
             nn.Conv1d(
                 in_channels=16, 
                 out_channels=32, 
@@ -27,7 +29,9 @@ class FinTextModel(nn.Module):
             ),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=11), 
+        )
 
+        self.community_cnn3 = nn.Sequential(
             nn.Conv1d(
                 in_channels=32, 
                 out_channels=64, 
@@ -83,7 +87,9 @@ class FinTextModel(nn.Module):
         print("community_tensor:", community_tensor.shape)
         print("community_metric_index:", community_metric_index.shape)
         print("price_index:", price_index.shape)
-        community_tensor = self.community_cnn(community_tensor)
+        community_tensor = self.community_cnn1(community_tensor)
+        community_tensor = self.community_cnn2(community_tensor)
+        community_tensor = self.community_cnn3(community_tensor)
         print("community_tensor:", community_tensor.shape)
         community_tensor = self.flatten(community_tensor)
         community_tensor = community_tensor.view(-1, 1)
