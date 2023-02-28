@@ -86,6 +86,7 @@ class TrainTestApp:
             )
 
     def prepare_optimizer(self):
+        print('Preparing optimizer')
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
         self.scheduler = optim.lr_scheduler.LambdaLR(
             optimizer=self.optimizer,
