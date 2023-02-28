@@ -83,12 +83,11 @@ class FinTextModel(nn.Module):
 
         self.softmax = nn.Sequential(
             nn.Linear(in_features=500, out_features=2), 
-            nn.Softmax(dim=2)
+            nn.Softmax(dim=1)
         )
 
     def forward(self, x):
         # Slicing Tensor
-        print('aaaa')
         community_tensor = x['community_tensor']
         community_tensor_dim = community_tensor.shape
         community_tensor = community_tensor.view(

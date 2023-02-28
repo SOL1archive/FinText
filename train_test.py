@@ -98,12 +98,10 @@ class TrainTestApp:
 
     def train(self):
         criterion = nn.CrossEntropyLoss().to(self.device)
-
         print('Training')
         print(len(self.dataset))
         for epoch in range(self.num_epoch):
             for i, (inputs, labels) in enumerate(self.train_dataloader):
-                print('training:', i)
                 self.model.train()
                 # Forward
                 inputs = to(inputs, self.device)
