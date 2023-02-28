@@ -14,7 +14,7 @@ class FinTextModel(nn.Module):
                 out_channels=16, 
                 kernel_size=(9, 768),
                 stride=1, 
-                padding=(1, 4, 0)
+                padding=(4, 0)
             ),
             nn.ReLU(inplace=True),
         )
@@ -79,7 +79,7 @@ class FinTextModel(nn.Module):
 
     def forward(self, x):
         # Slicing Tensor
-        community_tensor = torch.squeeze(x['community_tensor'])[0, :, :, :]
+        community_tensor = torch.squeeze(x['community_tensor'])
         community_metric_index = x['community_metric_index']
         price_index = x['price_index']
 
