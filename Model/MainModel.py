@@ -37,7 +37,7 @@ class FinTextModel(nn.Module):
                 padding=20
             ),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=11), 
+            nn.MaxPool1d(kernel_size=41), 
         )
 
         self.community_cnn3 = nn.Sequential(
@@ -49,7 +49,7 @@ class FinTextModel(nn.Module):
                 padding=20
             ),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=11), 
+            nn.MaxPool1d(kernel_size=41), 
         )
 
         self.community_metric_ffn = nn.Sequential(
