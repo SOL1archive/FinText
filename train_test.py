@@ -71,6 +71,7 @@ class TrainTestApp:
         print('Preparing model')
         self.model = FinTextModel()
         print('Init model')
+        print(self.model)
         if self.use_cuda:
             if torch.cuda.device_count() > 1:
                 self.model = nn.DataParallel(self.model)
